@@ -1,0 +1,96 @@
+{
+  "depression": [
+    {
+      "id": "interest",
+      "topic": "Interest and enjoyment",
+      "description": "Loss of interest or enjoyment in daily activities or hobbies.",
+      "keywords": ["interest", "enjoy", "motivation", "hobby", "fun", "pleasure"]
+    },
+    {
+      "id": "mood",
+      "topic": "Mood",
+      "description": "Feeling sad, low, hopeless, or emotionally down.",
+      "keywords": ["sad", "low", "hopeless", "down", "depressed"]
+    },
+    {
+      "id": "sleep",
+      "topic": "Sleep",
+      "description": "Difficulty sleeping, sleeping too much, or poor sleep quality.",
+      "keywords": ["sleep", "insomnia", "awake", "rest", "night", "tired"]
+    },
+    {
+      "id": "energy",
+      "topic": "Energy",
+      "description": "Feeling tired, exhausted, or lacking energy.",
+      "keywords": ["tired", "fatigue", "energy", "drained", "exhausted"]
+    },
+    {
+      "id": "appetite",
+      "topic": "Appetite",
+      "description": "Changes in eating habits or appetite.",
+      "keywords": ["eat", "food", "hungry", "appetite", "overeating", "not eating"]
+    },
+    {
+      "id": "self_worth",
+      "topic": "Self-worth",
+      "description": "Negative thoughts about oneself, guilt, or feeling like a failure.",
+      "keywords": ["worthless", "failure", "guilt", "blame", "useless"]
+    },
+    {
+      "id": "concentration",
+      "topic": "Concentration",
+      "description": "Difficulty focusing, remembering, or paying attention.",
+      "keywords": ["focus", "concentrate", "memory", "attention", "forget"]
+    },
+    {
+      "id": "activity",
+      "topic": "Activity level",
+      "description": "Moving much slower than usual or feeling unusually restless.",
+      "keywords": ["slow", "restless", "fidget", "moving", "sit still"]
+    },
+    {
+      "id": "safety",
+      "topic": "Safety",
+      "description": "Thoughts of self-harm, suicide, or feeling life is not worth living.",
+      "keywords": ["suicide", "die", "kill myself", "hurt myself", "self harm"]
+    }
+  ],
+  "anxiety": [
+    {
+      "id": "nervousness",
+      "topic": "Nervousness",
+      "description": "Feeling nervous, anxious, or constantly on edge.",
+      "keywords": ["nervous", "anxious", "on edge", "panic"]
+    },
+    {
+      "id": "worry",
+      "topic": "Excessive worry",
+      "description": "Frequent worrying that is difficult to control.",
+      "keywords": ["worry", "overthinking", "can't stop thinking", "concern"]
+    },
+    {
+      "id": "relaxation",
+      "topic": "Relaxation",
+      "description": "Difficulty relaxing or feeling calm.",
+      "keywords": ["relax", "calm", "tense"]
+    },
+    {
+      "id": "restlessness",
+      "topic": "Restlessness",
+      "description": "Feeling restless or unable to stay still.",
+      "keywords": ["restless", "fidget", "sit still"]
+    },
+    {
+      "id": "irritability",
+      "topic": "Irritability",
+      "description": "Becoming easily annoyed, frustrated, or irritated.",
+      "keywords": ["angry", "annoyed", "irritable", "frustrated"]
+    },
+    {
+      "id": "fear",
+      "topic": "Fear",
+      "description": "Feeling that something bad might happen or persistent fear.",
+      "keywords": ["afraid", "fear", "bad might happen", "worst"]
+    }
+  ]
+}
