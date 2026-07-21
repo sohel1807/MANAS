@@ -5,6 +5,7 @@ from prompt_builder import build_prompt
 from database.database import get_connection 
 from database.session import get_current_session, create_session, update_conversation
 import json
+import requests
 
 model = None
 
@@ -64,12 +65,35 @@ def chat(user_id, message, api_key, database_url):
         }
     )
 
+    EMOTION_API = "https://atharva7758--emotion-dev.modal.run"
+
+    response = requests.post(
+        EMOTION_API,
+        json={
+            "conversation": conversation
+        },
+        timeout=60
+    )
+
+    print(response)
+
+    response.raise_for_status()
+    analysis = response.json()
+
+
+
     # print("Conversation before update:")
     # print(conversation)
 
-    update_conversation(session_id, conversation, database_url)
-
     # print("Conversation updated successfully.")
     # print("=" * 50)
+
+
+    update_conversation(
+        session_id=session_id,
+        conversation=conversation,
+        analysis=analysis,
+        database_url=database_url
+    )
 
     return result.content

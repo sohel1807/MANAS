@@ -58,7 +58,7 @@ def create_session(user_id, database_url):
 
 
 
-def update_conversation(session_id, conversation, database_url):
+def update_conversation(session_id, conversation, analysis,database_url):
     conn = get_connection(database_url)
 
     # if conn is None:
@@ -68,14 +68,29 @@ def update_conversation(session_id, conversation, database_url):
     cur = conn.cursor()
 
     cur.execute("""
-        UPDATE current_session
-        SET conversation_json = %s,
-            updated_at = CURRENT_TIMESTAMP
-        WHERE session_id = %s
-    """, (
+    UPDATE current_session
+    SET
+        conversation_json = %s,
+        conversation_summary = %s,
+        emotion_json = %s,
+        symptom_json = %s,
+        covered_topics = %s,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE session_id = %s
+    """,
+    (
         json.dumps(conversation),
-        session_id,
-    ),)
+
+        json.dumps(analysis["conversation_summary"]),
+
+        json.dumps(analysis["emotion_json"]),
+
+        json.dumps(analysis["symptom_json"]),
+
+        json.dumps(analysis["covered_topics"]),
+
+        session_id
+    ))
 
     # print("Rows Updated:", cur.rowcount)    
 

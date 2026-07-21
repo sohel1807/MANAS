@@ -97,12 +97,15 @@ else:
         )
 
         response = requests.post(
-            "https://sohel1807--chat.modal.run",
+            "https://atharva7758--chat-dev.modal.run",
             json={
                 "user_id": st.session_state.user_id,
                 "message": user_input
             }
         )
+        
+        # print(response.status_code)
+        # print(response.text)
 
         reply = response.json()["reply"]
 
