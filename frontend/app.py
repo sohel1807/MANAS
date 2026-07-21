@@ -97,7 +97,7 @@ else:
         )
 
         response = requests.post(
-            "https://atharva7758--chat-dev.modal.run",
+            "https://amans1810--chat-dev.modal.run",
             json={
                 "user_id": st.session_state.user_id,
                 "message": user_input

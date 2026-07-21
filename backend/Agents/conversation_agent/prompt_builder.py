@@ -1,50 +1,124 @@
-from langchain_core.messages import SystemMessage, HumanMessage
-
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
-
-# import json
-
-# with open("C:\\Users\\sm\\OneDrive\\Documents\\CDAC_PROJECT\\backend\\Knowledge_base\\mental_health_indicators.json", "r", encoding="utf-8") as f:
-#     knowledge_base = json.load(f)
+from pathlib import Path
+import json
 
 
-def build_prompt(chat_history, user_message):
+SYSTEM_PROMPT_PATH = Path(__file__).parent / "system_prompt.txt"
 
-    with open("system_prompt.txt", "r", encoding="utf-8") as file:
-        system_prompt = file.read()
 
-    assessment_context = """
-Mental health areas that may naturally appear:
+def load_system_prompt():
 
-- Interest and enjoyment
-- Mood
-- Sleep
-- Energy
-- Appetite
-- Self-worth
-- Concentration
-- Activity level
-- Safety
-- Nervousness
-- Worry
-- Relaxation
-- Restlessness
-- Irritability
-- Fear
+    with open(
+        SYSTEM_PROMPT_PATH,
+        "r",
+        encoding="utf-8"
+    ) as f:
 
-Do not ask about every topic.
-Do not ask questionnaire-style questions.
-Naturally move to another area if enough information has already been gathered.
-"""
+        return f.read()
+
+
+def build_prompt(
+    chat_history,
+    user_message,
+    conversation_summary=None,
+    covered_topics=None,
+    emotion_json=None,
+    symptom_json=None,
+):
+
+    system_prompt = load_system_prompt()
+
+    context = []
+
+    # --------------------------------------------------
+    # Conversation Summary
+    # --------------------------------------------------
+
+    if conversation_summary:
+
+        context.append(
+            "Conversation Summary:\n"
+            + json.dumps(
+                conversation_summary,
+                indent=2
+            )
+        )
+
+    # --------------------------------------------------
+    # Emotion
+    # --------------------------------------------------
+
+    if emotion_json:
+
+        context.append(
+            "Detected Emotion:\n"
+            + json.dumps(
+                emotion_json,
+                indent=2
+            )
+        )
+
+    # --------------------------------------------------
+    # Symptoms
+    # --------------------------------------------------
+
+    if symptom_json:
+
+        context.append(
+            "Symptoms:\n"
+            + json.dumps(
+                symptom_json,
+                indent=2
+            )
+        )
+
+    # --------------------------------------------------
+    # Covered Topics
+    # --------------------------------------------------
+
+    if covered_topics:
+
+        context.append(
+            "Covered Topics:\n"
+            + json.dumps(
+                covered_topics,
+                indent=2
+            )
+        )
+
+    if context:
+
+        system_prompt += "\n\n"
+
+        system_prompt += "\n\n".join(context)
 
     messages = [
-        SystemMessage(
-            content=f"{system_prompt}\n\n{assessment_context}"
-        )
+
+        {
+            "role": "system",
+            "content": system_prompt
+        }
+
     ]
 
-    messages.extend(chat_history)
+    # --------------------------------------------------
+    # Recent Chat History
+    # --------------------------------------------------
 
-    messages.append(HumanMessage(content=user_message))
+    for msg in chat_history[-8:]:
+
+        messages.append(msg)
+
+    # --------------------------------------------------
+    # Current User Message
+    # --------------------------------------------------
+
+    messages.append(
+
+        {
+            "role": "user",
+            "content": user_message
+        }
+
+    )
 
     return messages

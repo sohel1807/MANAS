@@ -1,61 +1,90 @@
 from emotion_model import predict_emotion
+
 from analysis import generate_analysis
 
 
+# ==========================================================
+# Main Analysis Pipeline
+# ==========================================================
+
 def analyze(
-    conversation,
+    recent_messages,
+    conversation_summary,
+    symptom_json,
+    covered_topics,
     emotion_model,
-    groq_model
+    groq_model,
 ):
+    """
+    Complete Emotion + NLP Analysis Pipeline.
 
-    # -------------------------
-    # Latest User Message
-    # -------------------------
+    Parameters
+    ----------
+    recent_messages : list
 
-    latest_user_message = ""
+    conversation_summary : dict
 
-    for msg in reversed(conversation):
+    symptom_json : dict
 
-        if msg.get("role") == "user":
+    covered_topics : list
 
-            latest_user_message = msg.get("content", "")
+    emotion_model
+
+    groq_model
+
+    Returns
+    -------
+    dict
+    """
+
+    # --------------------------------------------------
+    # Find Latest User Message
+    # --------------------------------------------------
+
+    latest_message = ""
+
+    for message in reversed(recent_messages):
+
+        if message["role"] == "user":
+
+            latest_message = message["content"]
 
             break
 
-    # -------------------------
+    # --------------------------------------------------
     # Emotion Prediction
-    # -------------------------
+    # --------------------------------------------------
 
     emotion_json = predict_emotion(
-        latest_user_message,
+
+        latest_message,
+
         emotion_model
+
     )
 
-    # -------------------------
-    # Conversation Analysis
-    # -------------------------
+    # --------------------------------------------------
+    # Rolling Memory Analysis
+    # --------------------------------------------------
 
     analysis = generate_analysis(
-        conversation=conversation,
+
+        recent_messages=recent_messages,
+
+        conversation_summary=conversation_summary,
+
+        symptom_json=symptom_json,
+
+        covered_topics=covered_topics,
+
         groq_model=groq_model
+
     )
 
-    # -------------------------
-    # Final Response
-    # -------------------------
+    # --------------------------------------------------
+    # Attach Emotion
+    # --------------------------------------------------
 
-    return {
+    analysis["emotion_json"] = emotion_json
 
-        "conversation_summary":
-            analysis["conversation_summary"],
-
-        "emotion_json":
-            emotion_json,
-
-        "symptom_json":
-            analysis["symptom_json"],
-
-        "covered_topics":
-            analysis["covered_topics"]
-
-    }
+    return analysis
