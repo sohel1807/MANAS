@@ -9,6 +9,7 @@ from modal import (
 )
 
 from agent import analyze
+from analysis import load_groq_model
 from emotion_model import load_emotion_model
 
 
@@ -50,17 +51,22 @@ class EmotionService:
 
         print("Emotion Model Loaded")
 
+        print("Loading Groq Model...")
+
+        self.groq_model = load_groq_model(
+            os.environ["GROQ_API_KEY"]
+        )
+
+        print("Groq Model Loaded")
 
     @method()
     def analyze(self, conversation):
 
-        api_key = os.environ["GROQ_API_KEY"]
-
         return analyze(
-                conversation=conversation,
-                api_key=api_key,
-                emotion_model=self.emotion_model
-)
+            conversation=conversation,
+            emotion_model=self.emotion_model,
+            groq_model=self.groq_model
+    )
 
 
 @app.function()
@@ -70,8 +76,6 @@ class EmotionService:
 )
 def emotion(info: dict):
 
-    service = EmotionService()
-
-    return service.analyze.remote(
+    return EmotionService().analyze.remote(
         info["conversation"]
     )

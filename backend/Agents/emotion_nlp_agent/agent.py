@@ -1,12 +1,11 @@
 from emotion_model import predict_emotion
-from summary import generate_summary
-from nlp_extractor import extract
+from analysis import generate_analysis
 
 
 def analyze(
     conversation,
-    api_key,
-    emotion_model
+    emotion_model,
+    groq_model
 ):
 
     # -------------------------
@@ -17,14 +16,14 @@ def analyze(
 
     for msg in reversed(conversation):
 
-        if msg["role"] == "user":
+        if msg.get("role") == "user":
 
-            latest_user_message = msg["content"]
+            latest_user_message = msg.get("content", "")
 
             break
 
     # -------------------------
-    # Emotion
+    # Emotion Prediction
     # -------------------------
 
     emotion_json = predict_emotion(
@@ -33,21 +32,12 @@ def analyze(
     )
 
     # -------------------------
-    # Conversation Summary
+    # Conversation Analysis
     # -------------------------
 
-    conversation_summary = generate_summary(
-        conversation,
-        api_key
-    )
-
-    # -------------------------
-    # NLP Extraction
-    # -------------------------
-
-    extraction = extract(
-        conversation,
-        api_key
+    analysis = generate_analysis(
+        conversation=conversation,
+        groq_model=groq_model
     )
 
     # -------------------------
@@ -56,12 +46,16 @@ def analyze(
 
     return {
 
-        "conversation_summary": conversation_summary,
+        "conversation_summary":
+            analysis["conversation_summary"],
 
-        "emotion_json": emotion_json,
+        "emotion_json":
+            emotion_json,
 
-        "symptom_json": extraction["symptom_json"],
+        "symptom_json":
+            analysis["symptom_json"],
 
-        "covered_topics": extraction["covered_topics"]
+        "covered_topics":
+            analysis["covered_topics"]
 
     }

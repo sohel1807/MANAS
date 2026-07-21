@@ -4,9 +4,6 @@ from transformers import pipeline
 def load_emotion_model():
     """
     Load the Hugging Face emotion model once.
-
-    Returns:
-        transformers.Pipeline
     """
 
     return pipeline(
@@ -16,30 +13,29 @@ def load_emotion_model():
     )
 
 
-def predict_emotion(text, emotion_model):
-    """
-    Predict the primary emotion from text.
+def predict_emotion(
+    text,
+    emotion_model
+):
 
-    Args:
-        text: User message
-        emotion_model: Loaded HF pipeline
-
-    Returns:
-        dict
-    """
-
-    if not text.strip():
+    if not text or not text.strip():
 
         return {
+
             "primary_emotion": "neutral",
+
             "confidence": 0.0
+
         }
 
     predictions = emotion_model(text)[0]
 
     predictions.sort(
+
         key=lambda x: x["score"],
+
         reverse=True
+
     )
 
     primary = predictions[0]
@@ -50,6 +46,7 @@ def predict_emotion(text, emotion_model):
 
         "confidence": round(
             primary["score"],
-            4
+            3
         )
+
     }
