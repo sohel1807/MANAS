@@ -1,55 +1,142 @@
-from langchain_groq import ChatGroq
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
-from dotenv import load_dotenv
-from prompt_builder import build_prompt
-from database.database import get_connection 
-from database.session import get_current_session, create_session, update_conversation
-import json
 import requests
 
+from langchain_groq import ChatGroq
+from langchain_core.messages import HumanMessage, AIMessage
+
+from prompt_builder import build_prompt
+
+from database.session import (
+    get_current_session,
+    create_session,
+    update_conversation,
+)
+
 model = None
+
 
 def chat(user_id, message, api_key, database_url):
     global model
 
+    # --------------------------------------------------
+    # Initialize LLM (Only Once)
+    # --------------------------------------------------
+
     if model is None:
+
         model = ChatGroq(
             model_name="llama-3.3-70b-versatile",
             api_key=api_key,
         )
 
-    # print("=" * 50)
-    # print("USER ID:", user_id)
-    # print("MESSAGE:", message)
+    # --------------------------------------------------
+    # Load Existing Session
+    # --------------------------------------------------
 
-    session = get_current_session(user_id, database_url)
-    # print("SESSION:", session)
+    session = get_current_session(
+        user_id,
+        database_url
+    )
 
     if session is None:
-        print("No session found. Creating new session...")
-        session_id = create_session(user_id, database_url)
+
+        session_id = create_session(
+            user_id,
+            database_url
+        )
+
         conversation = []
+
+        conversation_summary = {}
+
+        emotion_json = {}
+
+        symptom_json = {}
+
+        covered_topics = []
+
     else:
+
         session_id = session["session_id"]
+
         conversation = session["conversation"]
 
-        # print("Conversation type:", type(conversation))
-        # print("Conversation:", conversation)
+        conversation_summary = session.get(
+            "conversation_summary",
+            {}
+        )
 
-        if isinstance(conversation, str):
-            conversation = json.loads(conversation)
+        emotion_json = session.get(
+            "emotion_json",
+            {}
+        )
+
+        symptom_json = session.get(
+            "symptom_json",
+            {}
+        )
+
+        covered_topics = session.get(
+            "covered_topics",
+            []
+        )
+
+    # --------------------------------------------------
+    # Use Only Recent Conversation
+    # --------------------------------------------------
+
+    recent_conversation = conversation[-8:]
 
     history = []
 
-    for msg in conversation:
-        if msg["role"] == "user":
-            history.append(HumanMessage(content=msg["content"]))
-        else:
-            history.append(AIMessage(content=msg["content"]))
+    for msg in recent_conversation:
 
-    messages = build_prompt(history, message)
+        if msg["role"] == "user":
+
+            history.append(
+                HumanMessage(
+                    content=msg["content"]
+                )
+            )
+
+        elif msg["role"] == "assistant":
+
+            history.append(
+                AIMessage(
+                    content=msg["content"]
+                )
+            )
+
+    # --------------------------------------------------
+    # Build Prompt
+    # --------------------------------------------------
+
+    messages = build_prompt(
+
+        chat_history=recent_conversation,
+
+        user_message=message,
+
+        conversation_summary=conversation_summary,
+
+        emotion_json=emotion_json,
+
+        symptom_json=symptom_json,
+
+        covered_topics=covered_topics,
+
+    )
+
+    # --------------------------------------------------
+    # Generate Assistant Response
+    # --------------------------------------------------
 
     result = model.invoke(messages)
+
+    assistant_reply = result.content
+
+    # --------------------------------------------------
+    # Update Conversation History
+    # --------------------------------------------------
 
     conversation.append(
         {
@@ -61,39 +148,58 @@ def chat(user_id, message, api_key, database_url):
     conversation.append(
         {
             "role": "assistant",
-            "content": result.content,
+            "content": assistant_reply,
         }
     )
 
-    EMOTION_API = "https://atharva7758--emotion-dev.modal.run"
+    # --------------------------------------------------
+    # Emotion & NLP Analysis
+    # --------------------------------------------------
+
+    EMOTION_API = "https://amans1810--emotion-dev.modal.run"
 
     response = requests.post(
-        EMOTION_API,
-        json={
-            "conversation": conversation
-        },
-        timeout=60
-    )
 
-    print(response)
+        EMOTION_API,
+
+        json={
+
+            "recent_messages": conversation[-8:],
+
+            "conversation_summary": conversation_summary,
+
+            "symptom_json": symptom_json,
+
+            "covered_topics": covered_topics,
+
+        },
+
+        timeout=60,
+
+    )
 
     response.raise_for_status()
+
     analysis = response.json()
 
-
-
-    # print("Conversation before update:")
-    # print(conversation)
-
-    # print("Conversation updated successfully.")
-    # print("=" * 50)
-
+    # --------------------------------------------------
+    # Save Updated Conversation + Memory
+    # --------------------------------------------------
 
     update_conversation(
+
         session_id=session_id,
+
         conversation=conversation,
+
         analysis=analysis,
-        database_url=database_url
+
+        database_url=database_url,
+
     )
 
-    return result.content
+    # --------------------------------------------------
+    # Return Assistant Reply
+    # --------------------------------------------------
+
+    return assistant_reply

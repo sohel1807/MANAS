@@ -4,31 +4,31 @@ import re
 from langchain_groq import ChatGroq
 from langchain_core.messages import (
     SystemMessage,
-    HumanMessage
+    HumanMessage,
 )
 
 from Knowledge_base.loader import load_knowledge_base
 
 
-# --------------------------------------------------
-# Load Knowledge Base Once
-# --------------------------------------------------
+# ==========================================================
+# Load Knowledge Base (Only Once)
+# ==========================================================
 
 knowledge = load_knowledge_base()
 
 
-# --------------------------------------------------
+# ==========================================================
 # Prompt Builder
-# --------------------------------------------------
+# ==========================================================
 
 def build_prompt():
 
     return f"""
 You are an expert Mental Health NLP Analysis Engine.
 
-Your ONLY task is to analyze a conversation.
+Your ONLY task is to update structured conversation memory.
 
-Do NOT chat.
+You are NOT a chatbot.
 
 Do NOT answer the user.
 
@@ -45,10 +45,36 @@ MENTAL HEALTH KNOWLEDGE BASE
 {json.dumps(knowledge, indent=2)}
 
 ==========================================================
+INPUT
+==========================================================
+
+You will receive ONE JSON object containing:
+
+{{
+    "conversation_summary": {{ ... }},
+    "covered_topics": [...],
+    "symptom_json": {{ ... }},
+    "recent_messages": [...]
+}}
+
+The conversation_summary, symptom_json and covered_topics
+represent PREVIOUSLY STORED MEMORY.
+
+recent_messages contains ONLY the latest messages.
+
+==========================================================
 YOUR TASK
 ==========================================================
 
-Analyze the COMPLETE conversation.
+Update the existing memory.
+
+Do NOT recreate everything from scratch.
+
+Preserve information that is still valid.
+
+Update only when recent_messages provide new evidence.
+
+Merge previous memory with new conversation.
 
 Return ONLY valid JSON.
 
@@ -74,37 +100,33 @@ Schema:
 SUMMARY RULES
 ==========================================================
 
-1.
+1. main_issue
 
-main_issue
+One short sentence describing the user's primary concern.
 
-One short sentence.
-
-Examples
+Examples:
 
 Work stress
 
-Relationship conflict
-
 Academic pressure
+
+Relationship conflict
 
 Sleep issues
 
 Financial worries
 
-2.
+2. overall_summary
 
-overall_summary
+Write 2–3 concise sentences.
 
-2-3 concise sentences.
+Update the previous summary using the recent conversation.
 
-Summarize the user's situation.
+Do NOT discard previously known information unless it is clearly contradicted.
 
-3.
+3. current_stage
 
-current_stage
-
-Must be one of
+Must be exactly one of:
 
 early
 
@@ -114,13 +136,15 @@ moderate
 
 well_understood
 
-4.
+4. protective_factors
 
-protective_factors
+Keep existing protective factors.
 
-Only include strengths clearly mentioned.
+Add newly discovered strengths.
 
-Examples
+Remove only if clearly contradicted.
+
+Examples:
 
 supportive family
 
@@ -132,25 +156,19 @@ exercise
 
 therapy
 
-religious support
+healthy coping
 
-positive coping
+5. risk_observations
 
-5.
+Return ONLY symptoms clearly supported by evidence.
 
-risk_observations
-
-Return ONLY clearly mentioned symptoms.
-
-Each item:
+Each observation:
 
 {{
     "symptom":"",
     "present":true,
     "confidence":0.95
 }}
-
-Do NOT include evidence.
 
 Never diagnose.
 
@@ -165,21 +183,21 @@ For EVERY indicator from the knowledge base return
 {{
     "<indicator_id>":
     {{
-        "present":true,
-        "confidence":0.95,
-        "evidence":[
+        "present": true,
+        "confidence": 0.95,
+        "evidence": [
             "Exact user sentence"
         ]
     }}
 }}
 
-If absent
+If absent:
 
-present=false
+present = false
 
-confidence=0.0
+confidence = 0.0
 
-evidence=[]
+evidence = []
 
 Use ONLY indicator IDs from the knowledge base.
 
@@ -189,9 +207,11 @@ Never invent evidence.
 COVERED TOPICS
 ==========================================================
 
-Return major topics only.
+Merge previous topics with newly discussed topics.
 
-Examples
+Remove duplicates.
+
+Examples:
 
 work
 
@@ -224,9 +244,10 @@ No explanation.
 No code fences.
 """
 
-# --------------------------------------------------
+
+# ==========================================================
 # Empty Symptom JSON
-# --------------------------------------------------
+# ==========================================================
 
 def build_empty_symptom_json():
 
@@ -249,9 +270,9 @@ def build_empty_symptom_json():
     return symptoms
 
 
-# --------------------------------------------------
+# ==========================================================
 # Empty Analysis
-# --------------------------------------------------
+# ==========================================================
 
 def empty_analysis():
 
@@ -278,9 +299,9 @@ def empty_analysis():
     }
 
 
-# --------------------------------------------------
+# ==========================================================
 # JSON Cleaner
-# --------------------------------------------------
+# ==========================================================
 
 def clean_json(text: str):
 
@@ -298,12 +319,13 @@ def clean_json(text: str):
 
         text = text[:-3]
 
+    text = re.sub(r"^json\s*", "", text, flags=re.IGNORECASE)
+
     return text.strip()
 
-
-# --------------------------------------------------
+# ==========================================================
 # JSON Parser
-# --------------------------------------------------
+# ==========================================================
 
 def parse_analysis(response_text):
 
@@ -317,9 +339,9 @@ def parse_analysis(response_text):
 
         return empty_analysis()
 
-    # -----------------------------
-    # Ensure top-level keys exist
-    # -----------------------------
+    # ------------------------------------------------------
+    # Top Level Keys
+    # ------------------------------------------------------
 
     data.setdefault(
         "conversation_summary",
@@ -337,6 +359,10 @@ def parse_analysis(response_text):
     )
 
     summary = data["conversation_summary"]
+
+    # ------------------------------------------------------
+    # Summary Defaults
+    # ------------------------------------------------------
 
     summary.setdefault(
         "main_issue",
@@ -363,9 +389,29 @@ def parse_analysis(response_text):
         []
     )
 
-    # -----------------------------
-    # Ensure every KB indicator exists
-    # -----------------------------
+    # ------------------------------------------------------
+    # Stage Validation
+    # ------------------------------------------------------
+
+    valid_stages = {
+
+        "early",
+
+        "exploring",
+
+        "moderate",
+
+        "well_understood"
+
+    }
+
+    if summary["current_stage"] not in valid_stages:
+
+        summary["current_stage"] = "early"
+
+    # ------------------------------------------------------
+    # Ensure Every Symptom Exists
+    # ------------------------------------------------------
 
     empty = build_empty_symptom_json()
 
@@ -375,21 +421,269 @@ def parse_analysis(response_text):
 
             data["symptom_json"][key] = value
 
+        else:
+
+            symptom = data["symptom_json"][key]
+
+            symptom.setdefault(
+                "present",
+                False
+            )
+
+            symptom.setdefault(
+                "confidence",
+                0.0
+            )
+
+            symptom.setdefault(
+                "evidence",
+                []
+            )
+
+            # ----------------------------------------------
+            # Type Validation
+            # ----------------------------------------------
+
+            symptom["present"] = bool(
+                symptom["present"]
+            )
+
+            try:
+
+                symptom["confidence"] = float(
+                    symptom["confidence"]
+                )
+
+            except Exception:
+
+                symptom["confidence"] = 0.0
+
+            if not isinstance(
+                symptom["evidence"],
+                list
+            ):
+
+                symptom["evidence"] = []
+
+            cleaned_evidence = []
+
+            seen = set()
+
+            for evidence in symptom["evidence"]:
+
+                if not isinstance(
+                    evidence,
+                    str
+                ):
+
+                    continue
+
+                evidence = evidence.strip()
+
+                if evidence == "":
+
+                    continue
+
+                if evidence in seen:
+
+                    continue
+
+                seen.add(evidence)
+
+                cleaned_evidence.append(
+                    evidence
+                )
+
+            symptom["evidence"] = cleaned_evidence
+
+    # ------------------------------------------------------
+    # Remove Unknown Symptom IDs
+    # ------------------------------------------------------
+
+    valid_ids = set(empty.keys())
+
+    invalid = []
+
+    for key in data["symptom_json"]:
+
+        if key not in valid_ids:
+
+            invalid.append(key)
+
+    for key in invalid:
+
+        del data["symptom_json"][key]
+
+    # ------------------------------------------------------
+    # Covered Topics Cleanup
+    # ------------------------------------------------------
+
+    if not isinstance(
+
+        data["covered_topics"],
+
+        list
+
+    ):
+
+        data["covered_topics"] = []
+
+    cleaned_topics = []
+
+    seen = set()
+
+    for topic in data["covered_topics"]:
+
+        if not isinstance(topic, str):
+
+            continue
+
+        topic = topic.strip().lower()
+
+        if topic == "":
+
+            continue
+
+        if topic in seen:
+
+            continue
+
+        seen.add(topic)
+
+        cleaned_topics.append(topic)
+
+    data["covered_topics"] = cleaned_topics
+
+    # ------------------------------------------------------
+    # Protective Factors Cleanup
+    # ------------------------------------------------------
+
+    if not isinstance(
+        summary["protective_factors"],
+        list
+    ):
+
+        summary["protective_factors"] = []
+
+    cleaned_pf = []
+
+    seen = set()
+
+    for item in summary["protective_factors"]:
+
+        if not isinstance(item, str):
+
+            continue
+
+        item = item.strip()
+
+        if item == "":
+
+            continue
+
+        if item.lower() in seen:
+
+            continue
+
+        seen.add(item.lower())
+
+        cleaned_pf.append(item)
+
+    summary["protective_factors"] = cleaned_pf
+
+    # ------------------------------------------------------
+    # Risk Observations Validation
+    # ------------------------------------------------------
+
+    if not isinstance(
+        summary["risk_observations"],
+        list
+    ):
+
+        summary["risk_observations"] = []
+
+    validated = []
+
+    for obs in summary["risk_observations"]:
+
+        if not isinstance(obs, dict):
+
+            continue
+
+        try:
+
+            confidence = float(
+                obs.get(
+                    "confidence",
+                    0.0
+                )
+            )
+
+        except Exception:
+
+            confidence = 0.0
+
+        validated.append({
+
+            "symptom": str(
+                obs.get(
+                    "symptom",
+                    ""
+                )
+            ),
+
+            "present": bool(
+                obs.get(
+                    "present",
+                    False
+                )
+            ),
+
+            "confidence": confidence
+
+        })
+
+    summary["risk_observations"] = validated
+
+    # ------------------------------------------------------
+    # Return Cleaned Analysis
+    # ------------------------------------------------------
+
     return data
 
-
-# --------------------------------------------------
+# ==========================================================
 # Main Analysis Function
-# --------------------------------------------------
+# ==========================================================
 
 def generate_analysis(
-    conversation,
+    recent_messages,
+    conversation_summary,
+    symptom_json,
+    covered_topics,
     groq_model
 ):
     """
-    Analyze the complete conversation.
+    Updates the conversation memory using rolling context.
 
-    Returns:
+    Parameters
+    ----------
+    recent_messages : list
+        Last few conversation messages.
+
+    conversation_summary : dict
+        Previously stored summary.
+
+    symptom_json : dict
+        Previously detected symptoms.
+
+    covered_topics : list
+        Previously covered topics.
+
+    groq_model : ChatGroq
+
+    Returns
+    -------
+    dict
         {
             conversation_summary,
             symptom_json,
@@ -397,15 +691,17 @@ def generate_analysis(
         }
     """
 
-    conversation_text = ""
+    payload = {
 
-    for message in conversation:
+        "conversation_summary": conversation_summary,
 
-        role = message.get("role", "user").capitalize()
+        "covered_topics": covered_topics,
 
-        content = message.get("content", "")
+        "symptom_json": symptom_json,
 
-        conversation_text += f"{role}: {content}\n"
+        "recent_messages": recent_messages
+
+    }
 
     messages = [
 
@@ -414,28 +710,32 @@ def generate_analysis(
         ),
 
         HumanMessage(
-            content=conversation_text
+            content=json.dumps(
+                payload,
+                indent=2,
+                ensure_ascii=False
+            )
         )
 
     ]
 
     result = groq_model.invoke(messages)
 
-    return parse_analysis(
-        result.content
-    )
+    analysis = parse_analysis(result.content)
+
+    return analysis
 
 
-# --------------------------------------------------
-# Create Shared Groq Model
-# --------------------------------------------------
+# ==========================================================
+# Shared Groq Model
+# ==========================================================
 
 def load_groq_model(api_key):
     """
     Creates a reusable ChatGroq instance.
 
-    This should be called ONLY ONCE inside
-    Modal @enter().
+    This should be called ONLY ONCE during
+    application startup (Modal @enter()).
     """
 
     return ChatGroq(
@@ -446,6 +746,6 @@ def load_groq_model(api_key):
 
         temperature=0,
 
-        max_retries=2
+        max_retries=2,
 
     )

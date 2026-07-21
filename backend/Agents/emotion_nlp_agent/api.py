@@ -13,6 +13,10 @@ from analysis import load_groq_model
 from emotion_model import load_emotion_model
 
 
+# ==========================================================
+# Modal Image
+# ==========================================================
+
 image = (
     Image.debian_slim(python_version="3.12")
     .pip_install(
@@ -34,6 +38,10 @@ app = App(
     image=image
 )
 
+
+# ==========================================================
+# Emotion Service
+# ==========================================================
 
 @app.cls(
     secrets=[
@@ -60,14 +68,34 @@ class EmotionService:
         print("Groq Model Loaded")
 
     @method()
-    def analyze(self, conversation):
+    def analyze(
+        self,
+        recent_messages,
+        conversation_summary,
+        symptom_json,
+        covered_topics,
+    ):
 
         return analyze(
-            conversation=conversation,
-            emotion_model=self.emotion_model,
-            groq_model=self.groq_model
-    )
 
+            recent_messages=recent_messages,
+
+            conversation_summary=conversation_summary,
+
+            symptom_json=symptom_json,
+
+            covered_topics=covered_topics,
+
+            emotion_model=self.emotion_model,
+
+            groq_model=self.groq_model,
+
+        )
+
+
+# ==========================================================
+# FastAPI Endpoint
+# ==========================================================
 
 @app.function()
 @modal.fastapi_endpoint(
@@ -77,5 +105,22 @@ class EmotionService:
 def emotion(info: dict):
 
     return EmotionService().analyze.remote(
-        info["conversation"]
+
+        recent_messages=info["recent_messages"],
+
+        conversation_summary=info.get(
+            "conversation_summary",
+            {}
+        ),
+
+        symptom_json=info.get(
+            "symptom_json",
+            {}
+        ),
+
+        covered_topics=info.get(
+            "covered_topics",
+            []
+        ),
+
     )
