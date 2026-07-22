@@ -41,28 +41,28 @@ def analyze(
     # Find Latest User Message
     # --------------------------------------------------
 
-    latest_message = ""
+# --------------------------------------------------
+# Last 3 User Messages
+# --------------------------------------------------
 
-    for message in reversed(recent_messages):
+    user_messages = []
+
+    for message in recent_messages:
 
         if message["role"] == "user":
 
-            latest_message = message["content"]
+            text = message["content"].strip()
 
-            break
+        if text:
 
+            user_messages.append(text)
+
+    emotion_text = "\n".join(user_messages[-3:])
     # --------------------------------------------------
     # Emotion Prediction
     # --------------------------------------------------
 
-    emotion_json = predict_emotion(
-
-        latest_message,
-
-        emotion_model
-
-    )
-
+    emotion_json = predict_emotion(emotion_text,emotion_model)
     # --------------------------------------------------
     # Rolling Memory Analysis
     # --------------------------------------------------

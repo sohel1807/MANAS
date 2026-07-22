@@ -1,8 +1,19 @@
 import uuid
 import json
+import psycopg2
+from dotenv import load_dotenv
 
-from database.database import get_connection
+# load_dotenv()
 
+# DATABASE_URL = os.getenv("DATABASE_URL")
+
+def get_connection(database_url):
+    try:
+        conn = psycopg2.connect(database_url)
+        return conn
+    except Exception as e:
+        print("Database Connection Error:", e)
+        return None
 
 # ==========================================================
 # Get Current Session
@@ -86,23 +97,17 @@ def create_session(user_id, database_url):
         """
         INSERT INTO current_session(
 
-            session_id,
-
-            user_id,
-
-            conversation_json,
-
-            conversation_summary,
-
-            emotion_json,
-
+        session_id,user_id,conversation_json,conversation_summary,
+        emotion_json,
             symptom_json,
-
-            covered_topics
+            covered_topics,
+            status
 
         )
 
         VALUES(
+
+            %s,
 
             %s,
 
@@ -122,22 +127,22 @@ def create_session(user_id, database_url):
         """,
 
         (
+        session_id,
 
-            session_id,
+        user_id,
 
-            user_id,
+        json.dumps([]),
 
-            json.dumps([]),
+        json.dumps({}),
 
-            json.dumps({}),
+        json.dumps({}),
 
-            json.dumps({}),
+        json.dumps({}),
 
-            json.dumps({}),
+        json.dumps([]),
 
-            json.dumps([])
-
-        )
+        "IN_PROGRESS"
+    )
 
     )
 
@@ -216,6 +221,46 @@ def update_conversation(
         )
 
     )
+
+    conn.commit()
+
+    cur.close()
+
+    conn.close()
+
+
+# ==========================================================
+# Update Session Status
+# ==========================================================
+
+def update_session_status(
+    session_id,
+    status,
+    database_url
+):
+
+    conn = get_connection(database_url)
+
+    cur = conn.cursor()
+
+
+    cur.execute(
+        """
+        UPDATE current_session
+
+        SET
+            status=%s,
+            updated_at=CURRENT_TIMESTAMP
+
+        WHERE session_id=%s
+        """,
+
+        (
+            status,
+            session_id
+        )
+    )
+
 
     conn.commit()
 
