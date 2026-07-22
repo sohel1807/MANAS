@@ -15,72 +15,22 @@ def load_system_prompt():
 
         return f.read()
 
-
 def build_prompt(
     chat_history,
     user_message,
-    conversation_summary=None,
-    covered_topics=None,
-    emotion_json=None,
-    symptom_json=None,
+    conversation_context=None,
 ):
 
     system_prompt = load_system_prompt()
 
     context = []
 
-    # --------------------------------------------------
-    # Conversation Summary
-    # --------------------------------------------------
-
-    if conversation_summary:
+    if conversation_context:
 
         context.append(
-            "Conversation Summary:\n"
+            "Conversation Context:\n"
             + json.dumps(
-                conversation_summary,
-                indent=2
-            )
-        )
-
-    # --------------------------------------------------
-    # Emotion
-    # --------------------------------------------------
-
-    if emotion_json:
-
-        context.append(
-            "Detected Emotion:\n"
-            + json.dumps(
-                emotion_json,
-                indent=2
-            )
-        )
-
-    # --------------------------------------------------
-    # Symptoms
-    # --------------------------------------------------
-
-    if symptom_json:
-
-        context.append(
-            "Symptoms:\n"
-            + json.dumps(
-                symptom_json,
-                indent=2
-            )
-        )
-
-    # --------------------------------------------------
-    # Covered Topics
-    # --------------------------------------------------
-
-    if covered_topics:
-
-        context.append(
-            "Covered Topics:\n"
-            + json.dumps(
-                covered_topics,
+                conversation_context,
                 indent=2
             )
         )
@@ -88,7 +38,6 @@ def build_prompt(
     if context:
 
         system_prompt += "\n\n"
-
         system_prompt += "\n\n".join(context)
 
     messages = [

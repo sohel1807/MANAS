@@ -23,217 +23,118 @@ knowledge = load_knowledge_base()
 
 def build_prompt():
 
-    return f"""
-You are an expert Mental Health NLP Analysis Engine.
+    return f"""You update structured conversation memory.
 
-Your ONLY task is to update structured conversation memory.
-
-You are NOT a chatbot.
-
-Do NOT answer the user.
-
-Do NOT provide advice.
-
-Do NOT diagnose.
-
-Use ONLY the Mental Health Knowledge Base below while extracting symptoms.
-
-==========================================================
-MENTAL HEALTH KNOWLEDGE BASE
-==========================================================
-
-{json.dumps(knowledge, indent=2)}
-
-==========================================================
 INPUT
-==========================================================
 
-You will receive ONE JSON object containing:
+- conversation_summary
+- covered_topics
+- symptom_json (contains ONLY active symptoms)
+- recent_messages
 
-{{
-    "conversation_summary": {{ ... }},
-    "covered_topics": [...],
-    "symptom_json": {{ ... }},
-    "recent_messages": [...]
-}}
+The first three represent the current database state.
 
-The conversation_summary, symptom_json and covered_topics
-represent PREVIOUSLY STORED MEMORY.
+Update ONLY using recent_messages.
 
-recent_messages contains ONLY the latest messages.
+--------------------------------------------------
+GENERAL RULES
+--------------------------------------------------
 
-==========================================================
-YOUR TASK
-==========================================================
+- Preserve existing information unless recent_messages provide clear new evidence.
+- Never invent facts.
+- Never infer information.
+- Never remove information unless the user explicitly contradicts it.
+- If nothing meaningful changed, return the previous memory unchanged.
 
-Update the existing memory.
+==================================================
+conversation_summary
+==================================================
 
-Do NOT recreate everything from scratch.
+main_issue
 
-Preserve information that is still valid.
+- Keep the current value unless the user's primary concern clearly changes.
 
-Update only when recent_messages provide new evidence.
+overall_summary
 
-Merge previous memory with new conversation.
+- Maximum 100 words.
+- Append only important long-term information.
+- Ignore greetings, acknowledgements, repetition and small talk.
+- Do not rewrite unless the user's situation meaningfully changes.
 
-Return ONLY valid JSON.
-
-Schema:
-
-{{
-    "conversation_summary":
-    {{
-        "main_issue":"",
-        "overall_summary":"",
-        "current_stage":"",
-        "protective_factors":[],
-        "risk_observations":[]
-    }},
-
-    "symptom_json":
-    {{}},
-
-    "covered_topics":[]
-}}
-
-==========================================================
-SUMMARY RULES
-==========================================================
-
-1. main_issue
-
-One short sentence describing the user's primary concern.
-
-Examples:
-
-Work stress
-
-Academic pressure
-
-Relationship conflict
-
-Sleep issues
-
-Financial worries
-
-2. overall_summary
-
-Write 2–3 concise sentences.
-
-Update the previous summary using the recent conversation.
-
-Do NOT discard previously known information unless it is clearly contradicted.
-
-3. current_stage
+current_stage
 
 Must be exactly one of:
 
 early
-
 exploring
-
 moderate
-
 well_understood
 
-4. protective_factors
+Rules:
 
-Keep existing protective factors.
+- Advance gradually.
+- Never skip stages.
+- Do not move backwards unless the conversation clearly restarts.
 
-Add newly discovered strengths.
+protective_factors
 
-Remove only if clearly contradicted.
+- Preserve existing factors.
+- Add newly discovered strengths.
+- Remove only if explicitly contradicted.
 
-Examples:
+risk_observations
 
-supportive family
+- Include only observations directly supported by the user's statements.
+- Never diagnose.
+- Never infer unsupported risks.
 
-good friends
+==================================================
+symptom_json
+==================================================
 
-stable job
+Return ONLY active symptoms.
 
-exercise
+If there are no active symptoms return:
 
-therapy
+"symptom_json": {{}}
 
-healthy coping
+For existing symptoms:
 
-5. risk_observations
+- Keep unchanged if no new evidence exists.
+- Append only new evidence.
+- Never duplicate evidence.
+- Never invent evidence.
+- Remove a symptom only if the user explicitly contradicts it.
 
-Return ONLY symptoms clearly supported by evidence.
+For new symptoms:
 
-Each observation:
+- Add only if directly supported by the user's own words.
+- Add only when confidence is high.
+- Do not guess.
+
+Each symptom should follow:
 
 {{
-    "symptom":"",
-    "present":true,
-    "confidence":0.95
+  "present": true,
+  "confidence": 0.95,
+  "evidence": [
+    "Exact user statement"
+  ]
 }}
 
-Never diagnose.
+==================================================
+covered_topics
+==================================================
 
-Never invent symptoms.
+Treat covered_topics as permanent conversation history.
 
-==========================================================
-SYMPTOM EXTRACTION RULES
-==========================================================
+- Append only genuinely discussed topics.
+- Never duplicate topics.
+- Never remove topics.
+- Do not add a topic from a passing mention.
+- A topic is considered covered only after meaningful discussion.
 
-For EVERY indicator from the knowledge base return
-
-{{
-    "<indicator_id>":
-    {{
-        "present": true,
-        "confidence": 0.95,
-        "evidence": [
-            "Exact user sentence"
-        ]
-    }}
-}}
-
-If absent:
-
-present = false
-
-confidence = 0.0
-
-evidence = []
-
-Use ONLY indicator IDs from the knowledge base.
-
-Never invent evidence.
-
-==========================================================
-COVERED TOPICS
-==========================================================
-
-Merge previous topics with newly discussed topics.
-
-Remove duplicates.
-
-Examples:
-
-work
-
-career
-
-sleep
-
-college
-
-health
-
-family
-
-relationship
-
-money
-
-stress
-
-anxiety
-
-==========================================================
+==================================================
 
 Return ONLY valid JSON.
 
@@ -243,32 +144,6 @@ No explanation.
 
 No code fences.
 """
-
-
-# ==========================================================
-# Empty Symptom JSON
-# ==========================================================
-
-def build_empty_symptom_json():
-
-    symptoms = {}
-
-    for category in knowledge.values():
-
-        for indicator in category:
-
-            symptoms[indicator["id"]] = {
-
-                "present": False,
-
-                "confidence": 0.0,
-
-                "evidence": []
-
-            }
-
-    return symptoms
-
 
 # ==========================================================
 # Empty Analysis
@@ -292,7 +167,7 @@ def empty_analysis():
 
         },
 
-        "symptom_json": build_empty_symptom_json(),
+        "symptom_json": {},
 
         "covered_topics": []
 
@@ -413,106 +288,30 @@ def parse_analysis(response_text):
     # Ensure Every Symptom Exists
     # ------------------------------------------------------
 
-    empty = build_empty_symptom_json()
+    if not isinstance(data["symptom_json"], dict):
+        data["symptom_json"] = {}
 
-    for key, value in empty.items():
+    for symptom in data["symptom_json"].values():
 
-        if key not in data["symptom_json"]:
+        symptom.setdefault("present", False)
+        symptom.setdefault("confidence", 0.0)
+        symptom.setdefault("evidence", [])
 
-            data["symptom_json"][key] = value
+        symptom["present"] = bool(symptom["present"])
 
-        else:
+        try:
+            symptom["confidence"] = float(symptom["confidence"])
+        except Exception:
+            symptom["confidence"] = 0.0
 
-            symptom = data["symptom_json"][key]
+        if not isinstance(symptom["evidence"], list):
+            symptom["evidence"] = []
 
-            symptom.setdefault(
-                "present",
-                False
-            )
-
-            symptom.setdefault(
-                "confidence",
-                0.0
-            )
-
-            symptom.setdefault(
-                "evidence",
-                []
-            )
-
-            # ----------------------------------------------
-            # Type Validation
-            # ----------------------------------------------
-
-            symptom["present"] = bool(
-                symptom["present"]
-            )
-
-            try:
-
-                symptom["confidence"] = float(
-                    symptom["confidence"]
-                )
-
-            except Exception:
-
-                symptom["confidence"] = 0.0
-
-            if not isinstance(
-                symptom["evidence"],
-                list
-            ):
-
-                symptom["evidence"] = []
-
-            cleaned_evidence = []
-
-            seen = set()
-
-            for evidence in symptom["evidence"]:
-
-                if not isinstance(
-                    evidence,
-                    str
-                ):
-
-                    continue
-
-                evidence = evidence.strip()
-
-                if evidence == "":
-
-                    continue
-
-                if evidence in seen:
-
-                    continue
-
-                seen.add(evidence)
-
-                cleaned_evidence.append(
-                    evidence
-                )
-
-            symptom["evidence"] = cleaned_evidence
-
-    # ------------------------------------------------------
-    # Remove Unknown Symptom IDs
-    # ------------------------------------------------------
-
-    valid_ids = set(empty.keys())
-
-    invalid = []
-
-    for key in data["symptom_json"]:
-
-        if key not in valid_ids:
-
-            invalid.append(key)
-
-    for key in invalid:
-
-        del data["symptom_json"][key]
+        symptom["evidence"] = list(dict.fromkeys([
+            e.strip()
+            for e in symptom["evidence"]
+            if isinstance(e, str) and e.strip()
+        ]))
 
     # ------------------------------------------------------
     # Covered Topics Cleanup
@@ -691,13 +490,21 @@ def generate_analysis(
         }
     """
 
+    active_symptoms = {}
+
+    for key, value in symptom_json.items():
+
+        if value.get("present"):
+
+            active_symptoms[key] = value
+
     payload = {
 
         "conversation_summary": conversation_summary,
 
         "covered_topics": covered_topics,
 
-        "symptom_json": symptom_json,
+        "symptom_json": active_symptoms,
 
         "recent_messages": recent_messages
 

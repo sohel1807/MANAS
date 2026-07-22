@@ -1,9 +1,8 @@
 import requests
-
 from langchain_groq import ChatGroq
-from langchain_core.messages import HumanMessage, AIMessage
 
 from prompt_builder import build_prompt
+from context_builder import build_conversation_context
 
 from database.session import (
     get_current_session,
@@ -48,8 +47,6 @@ def chat(user_id, message, api_key, database_url):
 
         conversation_summary = {}
 
-        emotion_json = {}
-
         symptom_json = {}
 
         covered_topics = []
@@ -62,11 +59,6 @@ def chat(user_id, message, api_key, database_url):
 
         conversation_summary = session.get(
             "conversation_summary",
-            {}
-        )
-
-        emotion_json = session.get(
-            "emotion_json",
             {}
         )
 
@@ -84,31 +76,23 @@ def chat(user_id, message, api_key, database_url):
     # Use Only Recent Conversation
     # --------------------------------------------------
 
-    recent_conversation = conversation[-8:]
-
-    history = []
-
-    for msg in recent_conversation:
-
-        if msg["role"] == "user":
-
-            history.append(
-                HumanMessage(
-                    content=msg["content"]
-                )
-            )
-
-        elif msg["role"] == "assistant":
-
-            history.append(
-                AIMessage(
-                    content=msg["content"]
-                )
-            )
+    recent_conversation =(conversation +
+        [
+            {
+                "role": "user",
+                "content": message
+            }
+        ]
+    )[-8:]
 
     # --------------------------------------------------
     # Build Prompt
     # --------------------------------------------------
+
+    conversation_context = build_conversation_context(
+        conversation_summary,
+        covered_topics,
+)
 
     messages = build_prompt(
 
@@ -116,13 +100,7 @@ def chat(user_id, message, api_key, database_url):
 
         user_message=message,
 
-        conversation_summary=conversation_summary,
-
-        emotion_json=emotion_json,
-
-        symptom_json=symptom_json,
-
-        covered_topics=covered_topics,
+        conversation_context=conversation_context,
 
     )
 
@@ -156,7 +134,7 @@ def chat(user_id, message, api_key, database_url):
     # Emotion & NLP Analysis
     # --------------------------------------------------
 
-    EMOTION_API = "https://amans1810--emotion-dev.modal.run"
+    EMOTION_API = "https://sohel1807--emotion-dev.modal.run"
 
     response = requests.post(
 
