@@ -1,0 +1,323 @@
+{
+  "phq9": [
+    {
+      "question_number": 1,
+      "id": "interest",
+      "topic": "Interest and enjoyment",
+      "description": "Loss of interest or pleasure in activities that were previously enjoyable.",
+      "priority": "high",
+      "completion_rule": "Need at least one meaningful user statement describing reduced interest or enjoyment.",
+      "keywords": [
+        "interest",
+        "enjoy",
+        "motivation",
+        "hobby",
+        "fun",
+        "pleasure",
+        "don't enjoy",
+        "don't feel like",
+        "no motivation"
+      ],
+      "follow_up_examples": [
+        "Have you noticed any changes in things you usually enjoy?",
+        "Do you still find pleasure in your hobbies or daily activities?",
+        "Have you lost interest in activities that were once enjoyable?"
+      ]
+    },
+    {
+      "question_number": 2,
+      "id": "mood",
+      "topic": "Depressed mood",
+      "description": "Feeling sad, hopeless, empty, or emotionally low.",
+      "priority": "high",
+      "completion_rule": "Need at least one meaningful statement describing persistent low mood.",
+      "keywords": [
+        "sad",
+        "low",
+        "hopeless",
+        "depressed",
+        "empty",
+        "down"
+      ],
+      "follow_up_examples": [
+        "How have you been feeling emotionally lately?",
+        "Do you often feel sad or low?",
+        "Would you say your mood has changed recently?"
+      ]
+    },
+    {
+      "question_number": 3,
+      "id": "sleep",
+      "topic": "Sleep",
+      "description": "Difficulty falling asleep, staying asleep, sleeping too much, or poor sleep quality.",
+      "priority": "high",
+      "completion_rule": "Need at least one meaningful statement about sleep quality or duration.",
+      "keywords": [
+        "sleep",
+        "insomnia",
+        "awake",
+        "night",
+        "rest",
+        "can't sleep",
+        "oversleep",
+        "waking up"
+      ],
+      "follow_up_examples": [
+        "How has your sleep been recently?",
+        "Are you sleeping more or less than usual?",
+        "Do you wake up feeling rested?"
+      ]
+    },
+    {
+      "question_number": 4,
+      "id": "energy",
+      "topic": "Energy",
+      "description": "Feeling tired, fatigued, or lacking energy.",
+      "priority": "high",
+      "completion_rule": "Need at least one meaningful statement about fatigue.",
+      "keywords": [
+        "tired",
+        "fatigue",
+        "drained",
+        "energy",
+        "exhausted",
+        "weak"
+      ],
+      "follow_up_examples": [
+        "Have you been feeling more tired than usual?",
+        "How has your energy level been?",
+        "Do you find yourself exhausted even after resting?"
+      ]
+    },
+    {
+      "question_number": 5,
+      "id": "appetite",
+      "topic": "Appetite",
+      "description": "Changes in appetite or eating habits.",
+      "priority": "medium",
+      "completion_rule": "Need at least one meaningful statement about appetite changes.",
+      "keywords": [
+        "eat",
+        "food",
+        "hungry",
+        "appetite",
+        "overeating",
+        "not eating",
+        "weight"
+      ],
+      "follow_up_examples": [
+        "Have your eating habits changed recently?",
+        "Has your appetite increased or decreased?",
+        "Are you eating normally these days?"
+      ]
+    },
+    {
+      "question_number": 6,
+      "id": "worthlessness",
+      "topic": "Worthlessness or guilt",
+      "description": "Feeling worthless, guilty, like a failure, or blaming oneself.",
+      "priority": "high",
+      "completion_rule": "Need at least one meaningful statement indicating guilt or worthlessness.",
+      "keywords": [
+        "worthless",
+        "failure",
+        "guilt",
+        "useless",
+        "blame myself",
+        "burden"
+      ],
+      "follow_up_examples": [
+        "How do you feel about yourself lately?",
+        "Do you ever blame yourself for things that happen?",
+        "Have you been feeling like a burden to others?"
+      ]
+    },
+    {
+      "question_number": 7,
+      "id": "concentration",
+      "topic": "Concentration",
+      "description": "Difficulty concentrating, remembering things, or making decisions.",
+      "priority": "medium",
+      "completion_rule": "Need at least one meaningful statement describing concentration difficulties.",
+      "keywords": [
+        "focus",
+        "concentrate",
+        "memory",
+        "forget",
+        "attention",
+        "can't focus"
+      ],
+      "follow_up_examples": [
+        "Have you been able to concentrate normally?",
+        "Do you find yourself forgetting things more often?",
+        "Has it become harder to stay focused?"
+      ]
+    },
+    {
+      "question_number": 8,
+      "id": "psychomotor",
+      "topic": "Psychomotor changes",
+      "description": "Moving or speaking noticeably slower than usual, or feeling unusually restless.",
+      "priority": "medium",
+      "completion_rule": "Need at least one meaningful statement describing slowing down or restlessness.",
+      "keywords": [
+        "slow",
+        "restless",
+        "moving slowly",
+        "fidget",
+        "can't sit still"
+      ],
+      "follow_up_examples": [
+        "Have you noticed yourself moving slower than usual?",
+        "Do you often feel restless or unable to sit still?",
+        "Have others commented that you've been unusually slow or restless?"
+      ]
+    },
+    {
+      "question_number": 9,
+      "id": "suicidal_ideation",
+      "topic": "Safety",
+      "description": "Thoughts that life is not worth living, self-harm, or suicide.",
+      "priority": "critical",
+      "completion_rule": "Need direct evidence from the user's own words.",
+      "keywords": [
+        "suicide",
+        "kill myself",
+        "die",
+        "self harm",
+        "end my life",
+        "life is not worth living"
+      ],
+      "follow_up_examples": [
+        "Sometimes when people feel overwhelmed they may feel life isn't worth living. Has that happened to you?",
+        "Have you had thoughts of hurting yourself?",
+        "Have you had thoughts that you'd be better off dead?"
+      ]
+    }
+  ],
+  "gad7": [
+    {
+      "question_number": 1,
+      "id": "nervousness",
+      "topic": "Feeling nervous or anxious",
+      "priority": "high",
+      "description": "Feeling nervous, anxious, or on edge.",
+      "completion_rule": "Need one meaningful statement describing nervousness.",
+      "keywords": [
+        "nervous",
+        "anxious",
+        "panic",
+        "on edge"
+      ],
+      "follow_up_examples": [
+        "How often have you been feeling anxious lately?",
+        "Do you often feel on edge?"
+      ]
+    },
+    {
+      "question_number": 2,
+      "id": "excessive_worry",
+      "topic": "Excessive worry",
+      "priority": "high",
+      "description": "Worrying too much about different things.",
+      "completion_rule": "Need one meaningful statement describing excessive worry.",
+      "keywords": [
+        "worry",
+        "overthinking",
+        "concern",
+        "can't stop thinking"
+      ],
+      "follow_up_examples": [
+        "What kinds of things have you been worrying about?",
+        "Do you find it difficult to stop worrying?"
+      ]
+    },
+    {
+      "question_number": 3,
+      "id": "worry_control",
+      "topic": "Difficulty controlling worry",
+      "priority": "high",
+      "description": "Difficulty stopping or controlling worrying.",
+      "completion_rule": "Need one meaningful statement describing inability to control worry.",
+      "keywords": [
+        "can't stop worrying",
+        "can't control my thoughts",
+        "mind keeps racing"
+      ],
+      "follow_up_examples": [
+        "When you start worrying, can you usually stop?",
+        "Do your worries feel difficult to control?"
+      ]
+    },
+    {
+      "question_number": 4,
+      "id": "relaxation",
+      "topic": "Trouble relaxing",
+      "priority": "medium",
+      "description": "Difficulty relaxing or feeling calm.",
+      "completion_rule": "Need one meaningful statement describing inability to relax.",
+      "keywords": [
+        "relax",
+        "tense",
+        "calm"
+      ],
+      "follow_up_examples": [
+        "Do you find it difficult to relax?",
+        "When you have free time, can you unwind easily?"
+      ]
+    },
+    {
+      "question_number": 5,
+      "id": "restlessness",
+      "topic": "Restlessness",
+      "priority": "medium",
+      "description": "Feeling so restless that it is hard to sit still.",
+      "completion_rule": "Need one meaningful statement describing restlessness.",
+      "keywords": [
+        "restless",
+        "fidget",
+        "can't sit still"
+      ],
+      "follow_up_examples": [
+        "Do you often feel restless?",
+        "Is it difficult for you to sit still?"
+      ]
+    },
+    {
+      "question_number": 6,
+      "id": "irritability",
+      "topic": "Irritability",
+      "priority": "medium",
+      "description": "Becoming easily annoyed or irritable.",
+      "completion_rule": "Need one meaningful statement describing irritability.",
+      "keywords": [
+        "angry",
+        "annoyed",
+        "irritable",
+        "frustrated"
+      ],
+      "follow_up_examples": [
+        "Have you been getting irritated more easily lately?",
+        "Do small things frustrate you more than before?"
+      ]
+    },
+    {
+      "question_number": 7,
+      "id": "fear",
+      "topic": "Fear that something awful might happen",
+      "priority": "medium",
+      "description": "Persistent fear that something bad may happen.",
+      "completion_rule": "Need one meaningful statement describing persistent fear.",
+      "keywords": [
+        "afraid",
+        "fear",
+        "worst",
+        "something bad"
+      ],
+      "follow_up_examples": [
+        "Do you often feel that something bad might happen?",
+        "Do you find yourself expecting the worst?"
+      ]
+    }
+  ]
+}

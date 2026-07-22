@@ -7,7 +7,8 @@ def build_conversation_context(
 ):
 
     conversation_summary = conversation_summary or {}
-    covered_topics = covered_topics or []
+
+    covered_topics = covered_topics or {}
 
     return {
 
@@ -21,6 +22,19 @@ def build_conversation_context(
             "early"
         ),
 
-        "topics_done": covered_topics
+        "general_topics": covered_topics.get(
+            "general",
+            []
+        ),
+
+        "phq9_topics": covered_topics.get(
+            "phq9",
+            []
+        ),
+
+        "gad7_topics": covered_topics.get(
+            "gad7",
+            []
+        )
 
     }

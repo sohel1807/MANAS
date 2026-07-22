@@ -12,6 +12,12 @@ from database.session import (
 
 model = None
 
+# ==========================================================
+# Memory Agent Endpoint
+# ==========================================================
+
+MEMORY_API = "https://atharva7758--memory-dev.modal.run"
+
 
 def chat(user_id, message, api_key, database_url):
     global model
@@ -45,11 +51,19 @@ def chat(user_id, message, api_key, database_url):
 
         conversation = []
 
-        conversation_summary = {}
+        conversation_summary = {
+            "main_issue": "",
+            "overall_summary": "",
+            "current_stage": "early",
+            "protective_factors": [],
+            "risk_observations": []
+        }
 
-        symptom_json = {}
-
-        covered_topics = []
+        covered_topics = {
+            "general": [],
+            "phq9": [],
+            "gad7": []
+        }
 
     else:
 
@@ -59,25 +73,31 @@ def chat(user_id, message, api_key, database_url):
 
         conversation_summary = session.get(
             "conversation_summary",
-            {}
-        )
-
-        symptom_json = session.get(
-            "symptom_json",
-            {}
+            {
+                "main_issue": "",
+                "overall_summary": "",
+                "current_stage": "early",
+                "protective_factors": [],
+                "risk_observations": []
+            }
         )
 
         covered_topics = session.get(
             "covered_topics",
-            []
+            {
+                "general": [],
+                "phq9": [],
+                "gad7": []
+            }
         )
 
     # --------------------------------------------------
     # Use Only Recent Conversation
     # --------------------------------------------------
 
-    recent_conversation =(conversation +
-        [
+    recent_conversation = (
+        conversation
+        + [
             {
                 "role": "user",
                 "content": message
@@ -92,16 +112,11 @@ def chat(user_id, message, api_key, database_url):
     conversation_context = build_conversation_context(
         conversation_summary,
         covered_topics,
-)
+    )
 
     messages = build_prompt(
-
         chat_history=recent_conversation,
-
-        user_message=message,
-
         conversation_context=conversation_context,
-
     )
 
     # --------------------------------------------------
@@ -131,34 +146,41 @@ def chat(user_id, message, api_key, database_url):
     )
 
     # --------------------------------------------------
-    # Emotion & NLP Analysis
+    # Memory Update
     # --------------------------------------------------
 
-    EMOTION_API = "https://sohel1807--emotion-dev.modal.run"
+    try:
 
-    response = requests.post(
+        response = requests.post(
 
-        EMOTION_API,
+            MEMORY_API,
 
-        json={
+            json={
 
-            "recent_messages": conversation[-8:],
+                "recent_messages": conversation[-8:],
 
+                "conversation_summary": conversation_summary,
+
+                "covered_topics": covered_topics,
+
+            },
+
+            timeout=60,
+
+        )
+
+        response.raise_for_status()
+
+        analysis = response.json()
+
+    except Exception as e:
+
+        print(f"Memory Agent Error: {e}")
+
+        analysis = {
             "conversation_summary": conversation_summary,
-
-            "symptom_json": symptom_json,
-
             "covered_topics": covered_topics,
-
-        },
-
-        timeout=60,
-
-    )
-
-    response.raise_for_status()
-
-    analysis = response.json()
+        }
 
     # --------------------------------------------------
     # Save Updated Conversation + Memory

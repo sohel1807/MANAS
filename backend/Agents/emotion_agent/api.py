@@ -9,8 +9,8 @@ from modal import (
 )
 
 from agent import analyze
-from analysis import load_groq_model
 from emotion_model import load_emotion_model
+from symptom_analysis import load_groq_model
 
 
 # ==========================================================
@@ -34,13 +34,13 @@ image = (
 
 
 app = App(
-    name="Emotion-NLP-Agent",
+    name="Analysis-Agent",
     image=image
 )
 
 
 # ==========================================================
-# Emotion Service
+# Analysis Service
 # ==========================================================
 
 @app.cls(
@@ -48,7 +48,7 @@ app = App(
         modal.Secret.from_name("groq")
     ]
 )
-class EmotionService:
+class AnalysisService:
 
     @enter()
     def startup(self):
@@ -67,24 +67,16 @@ class EmotionService:
 
         print("Groq Model Loaded")
 
+
     @method()
     def analyze(
         self,
-        recent_messages,
-        conversation_summary,
-        symptom_json,
-        covered_topics,
+        conversation,
     ):
 
         return analyze(
 
-            recent_messages=recent_messages,
-
-            conversation_summary=conversation_summary,
-
-            symptom_json=symptom_json,
-
-            covered_topics=covered_topics,
+            conversation=conversation,
 
             emotion_model=self.emotion_model,
 
@@ -99,28 +91,13 @@ class EmotionService:
 
 @app.function()
 @modal.fastapi_endpoint(
-    label="emotion",
+    label="analysis",
     method="POST"
 )
-def emotion(info: dict):
+def analysis(info: dict):
 
-    return EmotionService().analyze.remote(
+    return AnalysisService().analyze.remote(
 
-        recent_messages=info["recent_messages"],
-
-        conversation_summary=info.get(
-            "conversation_summary",
-            {}
-        ),
-
-        symptom_json=info.get(
-            "symptom_json",
-            {}
-        ),
-
-        covered_topics=info.get(
-            "covered_topics",
-            []
-        ),
+        conversation=info["conversation"]
 
     )

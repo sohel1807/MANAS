@@ -17,7 +17,6 @@ def load_system_prompt():
 
 def build_prompt(
     chat_history,
-    user_message,
     conversation_context=None,
 ):
 
@@ -31,7 +30,8 @@ def build_prompt(
             "Conversation Context:\n"
             + json.dumps(
                 conversation_context,
-                indent=2
+                indent=2,
+                ensure_ascii=False
             )
         )
 
@@ -57,17 +57,6 @@ def build_prompt(
 
         messages.append(msg)
 
-    # --------------------------------------------------
-    # Current User Message
-    # --------------------------------------------------
-
-    messages.append(
-
-        {
-            "role": "user",
-            "content": user_message
-        }
-
-    )
+    
 
     return messages

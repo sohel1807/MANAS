@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 # DATABASE_URL = os.getenv("DATABASE_URL")
 
+
 def get_connection(database_url):
     try:
         conn = psycopg2.connect(database_url)
@@ -14,6 +15,26 @@ def get_connection(database_url):
     except Exception as e:
         print("Database Connection Error:", e)
         return None
+
+
+# ==========================================================
+# Default Structures
+# ==========================================================
+
+DEFAULT_SUMMARY = {
+    "main_issue": "",
+    "overall_summary": "",
+    "current_stage": "early",
+    "protective_factors": [],
+    "risk_observations": []
+}
+
+DEFAULT_COVERED_TOPICS = {
+    "general": [],
+    "phq9": [],
+    "gad7": []
+}
+
 
 # ==========================================================
 # Get Current Session
@@ -49,36 +70,49 @@ def get_current_session(user_id, database_url):
 
         LIMIT 1
         """,
-
         (user_id,)
-
     )
 
     row = cur.fetchone()
 
     cur.close()
-
     conn.close()
 
-    if row:
+    if not row:
+        return None
 
-        return {
+    # ------------------------------------------------------
+    # Handle old sessions created before covered_topics
+    # was changed from list -> dictionary
+    # ------------------------------------------------------
 
-            "session_id": str(row[0]),
+    covered_topics = row[5]
 
-            "conversation": row[1] or [],
+    if not isinstance(covered_topics, dict):
+        covered_topics = DEFAULT_COVERED_TOPICS.copy()
 
-            "conversation_summary": row[2] or {},
+    conversation_summary = row[2]
 
-            "emotion_json": row[3] or {},
+    if not isinstance(conversation_summary, dict):
+        conversation_summary = DEFAULT_SUMMARY.copy()
 
-            "symptom_json": row[4] or {},
+    return {
 
-            "covered_topics": row[5] or []
+        "session_id": str(row[0]),
 
-        }
+        "conversation": row[1] or [],
 
-    return None
+        "conversation_summary": conversation_summary,
+
+        # Reserved for post-session analysis
+        "emotion_json": row[3] or {},
+
+        # Reserved for post-session analysis
+        "symptom_json": row[4] or {},
+
+        "covered_topics": covered_topics
+
+    }
 
 
 # ==========================================================
@@ -97,8 +131,11 @@ def create_session(user_id, database_url):
         """
         INSERT INTO current_session(
 
-        session_id,user_id,conversation_json,conversation_summary,
-        emotion_json,
+            session_id,
+            user_id,
+            conversation_json,
+            conversation_summary,
+            emotion_json,
             symptom_json,
             covered_topics,
             status
@@ -108,41 +145,36 @@ def create_session(user_id, database_url):
         VALUES(
 
             %s,
-
             %s,
-
             %s,
-
             %s,
-
             %s,
-
             %s,
-
             %s,
-
             %s
 
         )
         """,
 
         (
-        session_id,
 
-        user_id,
+            session_id,
 
-        json.dumps([]),
+            user_id,
 
-        json.dumps({}),
+            json.dumps([]),
 
-        json.dumps({}),
+            json.dumps(DEFAULT_SUMMARY),
 
-        json.dumps({}),
+            json.dumps({}),
 
-        json.dumps([]),
+            json.dumps({}),
 
-        "IN_PROGRESS"
-    )
+            json.dumps(DEFAULT_COVERED_TOPICS),
+
+            "IN_PROGRESS"
+
+        )
 
     )
 
@@ -175,52 +207,67 @@ def update_conversation(
 
     cur = conn.cursor()
 
-    cur.execute(
-        """
-        UPDATE current_session
+    if analysis is None:
 
-        SET
+        cur.execute(
+            """
+            UPDATE current_session
 
-            conversation_json=%s,
+            SET
 
-            conversation_summary=%s,
+                conversation_json=%s,
 
-            emotion_json=%s,
+                updated_at=CURRENT_TIMESTAMP
 
-            symptom_json=%s,
+            WHERE session_id=%s
+            """,
 
-            covered_topics=%s,
+            (
 
-            updated_at=CURRENT_TIMESTAMP
+                json.dumps(conversation),
 
-        WHERE session_id=%s
-        """,
+                session_id
 
-        (
-
-            json.dumps(conversation),
-
-            json.dumps(
-                analysis["conversation_summary"]
-            ),
-
-            json.dumps(
-                analysis["emotion_json"]
-            ),
-
-            json.dumps(
-                analysis["symptom_json"]
-            ),
-
-            json.dumps(
-                analysis["covered_topics"]
-            ),
-
-            session_id
+            )
 
         )
 
-    )
+    else:
+
+        cur.execute(
+            """
+            UPDATE current_session
+
+            SET
+
+                conversation_json=%s,
+
+                conversation_summary=%s,
+
+                covered_topics=%s,
+
+                updated_at=CURRENT_TIMESTAMP
+
+            WHERE session_id=%s
+            """,
+
+            (
+
+                json.dumps(conversation),
+
+                json.dumps(
+                    analysis["conversation_summary"]
+                ),
+
+                json.dumps(
+                    analysis["covered_topics"]
+                ),
+
+                session_id
+
+            )
+
+        )
 
     conn.commit()
 
@@ -243,7 +290,6 @@ def update_session_status(
 
     cur = conn.cursor()
 
-
     cur.execute(
         """
         UPDATE current_session
@@ -261,6 +307,77 @@ def update_session_status(
         )
     )
 
+    conn.commit()
+
+    cur.close()
+
+    conn.close()
+
+# ==========================================================
+# Update Post Session Analysis
+# ==========================================================
+
+def update_post_session(
+    session_id,
+    database_url,
+    emotion_json=None,
+    symptom_json=None,
+    assessment_json=None
+):
+
+    conn = get_connection(database_url)
+
+    cur = conn.cursor()
+
+    updates = []
+    values = []
+
+    if emotion_json is not None:
+
+        updates.append("emotion_json=%s")
+
+        values.append(
+            json.dumps(emotion_json)
+        )
+
+    if symptom_json is not None:
+
+        updates.append("symptom_json=%s")
+
+        values.append(
+            json.dumps(symptom_json)
+        )
+
+    if assessment_json is not None:
+
+        updates.append("assessment_json=%s")
+
+        values.append(
+            json.dumps(assessment_json)
+        )
+
+    updates.append(
+        "updated_at=CURRENT_TIMESTAMP"
+    )
+
+    values.append(session_id)
+
+    query = f"""
+
+        UPDATE current_session
+
+        SET
+
+            {", ".join(updates)}
+
+        WHERE session_id=%s
+
+    """
+
+    cur.execute(
+        query,
+        tuple(values)
+    )
 
     conn.commit()
 
