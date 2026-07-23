@@ -50,20 +50,21 @@ def get_current_session(user_id, database_url):
         """
         SELECT
 
-            session_id,
+        session_id,
 
-            conversation_json,
+        conversation_json,
 
-            conversation_summary,
+        conversation_summary,
 
-            emotion_json,
+        emotion_json,
 
-            symptom_json,
+        symptom_json,
 
-            covered_topics
+        assessment_json,
+
+        covered_topics
 
         FROM current_session
-
         WHERE user_id=%s
 
         AND status='IN_PROGRESS'
@@ -86,7 +87,9 @@ def get_current_session(user_id, database_url):
     # was changed from list -> dictionary
     # ------------------------------------------------------
 
-    covered_topics = row[5]
+    assessment_json = row[5]
+
+    covered_topics = row[6]
 
     if not isinstance(covered_topics, dict):
         covered_topics = DEFAULT_COVERED_TOPICS.copy()
@@ -104,11 +107,11 @@ def get_current_session(user_id, database_url):
 
         "conversation_summary": conversation_summary,
 
-        # Reserved for post-session analysis
         "emotion_json": row[3] or {},
 
-        # Reserved for post-session analysis
         "symptom_json": row[4] or {},
+
+        "assessment_json": assessment_json or {},
 
         "covered_topics": covered_topics
 
@@ -137,6 +140,7 @@ def create_session(user_id, database_url):
             conversation_summary,
             emotion_json,
             symptom_json,
+            assessment_json,
             covered_topics,
             status
 
@@ -151,11 +155,11 @@ def create_session(user_id, database_url):
             %s,
             %s,
             %s,
+            %s,
             %s
 
         )
         """,
-
         (
 
             session_id,
@@ -166,9 +170,11 @@ def create_session(user_id, database_url):
 
             json.dumps(DEFAULT_SUMMARY),
 
-            json.dumps({}),
+            json.dumps({}),          # emotion_json
 
-            json.dumps({}),
+            json.dumps({}),          # symptom_json
+
+            json.dumps({}),          # assessment_json
 
             json.dumps(DEFAULT_COVERED_TOPICS),
 
@@ -322,7 +328,8 @@ def update_post_session(
     database_url,
     emotion_json=None,
     symptom_json=None,
-    assessment_json=None
+    assessment_json=None,
+    recommendation_json=None
 ):
 
     conn = get_connection(database_url)
@@ -332,6 +339,7 @@ def update_post_session(
     updates = []
     values = []
 
+
     if emotion_json is not None:
 
         updates.append("emotion_json=%s")
@@ -339,6 +347,7 @@ def update_post_session(
         values.append(
             json.dumps(emotion_json)
         )
+
 
     if symptom_json is not None:
 
@@ -348,6 +357,7 @@ def update_post_session(
             json.dumps(symptom_json)
         )
 
+
     if assessment_json is not None:
 
         updates.append("assessment_json=%s")
@@ -356,28 +366,43 @@ def update_post_session(
             json.dumps(assessment_json)
         )
 
+
+    if recommendation_json is not None:
+
+        updates.append("recommendation_json=%s")
+
+        values.append(
+            json.dumps(recommendation_json)
+        )
+
+
+    # Always update timestamp
+
     updates.append(
         "updated_at=CURRENT_TIMESTAMP"
     )
 
+
+    # Add WHERE condition value
+
     values.append(session_id)
 
-    query = f"""
 
+    query = f"""
         UPDATE current_session
 
         SET
-
             {", ".join(updates)}
 
         WHERE session_id=%s
-
     """
+
 
     cur.execute(
         query,
         tuple(values)
     )
+
 
     conn.commit()
 

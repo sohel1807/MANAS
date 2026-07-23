@@ -16,7 +16,7 @@ model = None
 # Memory Agent Endpoint
 # ==========================================================
 
-MEMORY_API = "https://atharva7758--memory-dev.modal.run"
+MEMORY_API = "https://sohel1807--memory-dev.modal.run"
 
 
 def chat(user_id, message, api_key, database_url):

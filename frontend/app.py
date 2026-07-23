@@ -190,13 +190,16 @@ else:
 
 
             response=requests.post(
-                "https://atharva7758--stop-session-dev.modal.run",
+                "https://sohel1807--stop-session-dev.modal.run",
                 json={
                     "user_id":
                     st.session_state.user_id
                 }
             )
 
+
+            print(response.status_code)
+            print(response.text)
 
             data=response.json()
 
@@ -267,7 +270,7 @@ else:
 
 
             response=requests.post(
-                "https://atharva7758--chat-dev.modal.run",
+                "https://sohel1807--chat-dev.modal.run",
                 json={
                     "user_id":
                     st.session_state.user_id,
@@ -279,7 +282,12 @@ else:
 
 
 
+            print(response.status_code)
+            print(response.text)
+
             data=response.json()
+
+           
 
 
             reply=data["reply"]

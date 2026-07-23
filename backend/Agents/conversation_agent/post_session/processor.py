@@ -4,7 +4,8 @@ from database.session import (
 )
 
 from post_session.analysis import (
-    call_analysis_agent
+    call_analysis_agent,
+    call_assessment_agent
 )
 
 
@@ -20,7 +21,6 @@ def process_session(
     session_id = session["session_id"]
     conversation = session["conversation"]
     conversation_summary = session["conversation_summary"]
-    covered_topics = session["covered_topics"]
 
     print("=" * 60)
     print(f"Processing Session: {session_id}")
@@ -40,15 +40,19 @@ def process_session(
         raise Exception("Analysis Agent returned None.")
 
     if "emotion_timeline" not in analysis:
-        raise Exception("emotion_timeline missing from Analysis Agent response.")
+        raise Exception(
+            "emotion_timeline missing from Analysis Agent response."
+        )
 
     if "symptoms" not in analysis:
-        raise Exception("symptoms missing from Analysis Agent response.")
+        raise Exception(
+            "symptoms missing from Analysis Agent response."
+        )
 
     print("Analysis Completed")
 
     # ------------------------------------------------------
-    # Save Analysis Results
+    # Save Analysis
     # ------------------------------------------------------
 
     print("Saving Analysis Results...")
@@ -73,23 +77,71 @@ def process_session(
 
     print("Calling Assessment Agent...")
 
-    # TODO
-    # assessment = call_assessment_agent(
-    #     emotion_timeline=analysis["emotion_timeline"],
-    #     symptoms=analysis["symptoms"]
-    # )
+    assessment = call_assessment_agent(
+
+        conversation_summary=conversation_summary,
+
+        symptom_json=analysis["symptoms"]
+
+    )
+
+    if assessment is None:
+
+        raise Exception(
+            "Assessment Agent returned None."
+        )
 
     print("Assessment Completed")
 
     # ------------------------------------------------------
-    # Complete
+    # Save Assessment
     # ------------------------------------------------------
 
-    update_session_status(
-        session_id,
-        "COMPLETED",
-        database_url
+    print("Saving Assessment...")
+
+    update_post_session(
+
+        session_id=session_id,
+
+        database_url=database_url,
+
+        assessment_json=assessment
+
     )
 
-    print("Session Completed")
+    print("Assessment Saved")
+
+    # ------------------------------------------------------
+    # RAG Agent
+    # ------------------------------------------------------
+
+    # print("Calling RAG Agent...")
+
+    # recommendation = call_rag_agent(
+    #     assessment_json=assessment,
+    #     emotion_json=analysis["emotion_timeline"],
+    #     symptom_json=analysis["symptoms"]
+    # )
+
+    # update_post_session(
+    #     session_id=session_id,
+    #     database_url=database_url,
+    #     recommendation_json=recommendation
+    # )
+
+    # print("RAG Completed")
+
+    # ------------------------------------------------------
+    # Complete Session
+    # ------------------------------------------------------
+
+    # update_session_status(
+    #     session_id,
+    #     "COMPLETED",
+    #     database_url
+    # )
+
+    print("RAG Agent not implemented yet.")
+    print("Session remains in PROCESSING state.")
+
     print("=" * 60)
