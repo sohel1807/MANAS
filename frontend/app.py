@@ -198,8 +198,8 @@ else:
             )
 
 
-            print(response.status_code)
-            print(response.text)
+            #print(response.status_code)
+            #print(response.text)
 
             data=response.json()
 
@@ -282,8 +282,9 @@ else:
 
 
 
-            print(response.status_code)
-            print(response.text)
+
+            # print(response.status_code)
+            # print(response.text)
 
             data=response.json()
 

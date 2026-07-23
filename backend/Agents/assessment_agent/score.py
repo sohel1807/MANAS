@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from score_mapper import apply_symptom_evidence
 
 
 # ==========================================================
@@ -23,7 +24,6 @@ def phq9_severity(score):
     return "Severe"
 
 
-
 # ==========================================================
 # GAD-7 Severity
 # ==========================================================
@@ -42,7 +42,6 @@ def gad7_severity(score):
     return "Severe"
 
 
-
 # ==========================================================
 # Overall Risk
 # ==========================================================
@@ -54,14 +53,13 @@ def overall_risk(
 
     severity_rank = {
 
-        "Minimal":0,
-        "Mild":1,
-        "Moderate":2,
-        "Moderately Severe":3,
-        "Severe":4
+        "Minimal": 0,
+        "Mild": 1,
+        "Moderate": 2,
+        "Moderately Severe": 3,
+        "Severe": 4
 
     }
-
 
     highest = max(
 
@@ -70,7 +68,6 @@ def overall_risk(
         severity_rank[gad_severity]
 
     )
-
 
     if highest == 0:
         return "Low"
@@ -85,7 +82,6 @@ def overall_risk(
         return "High"
 
 
-
 # ==========================================================
 # Dominant Areas
 # ==========================================================
@@ -95,26 +91,29 @@ def extract_dominant_areas(
     top_k=3
 ):
 
-    areas=[]
+    symptoms = symptom_json.get(
+        "symptoms",
+        symptom_json
+    )
 
+    areas = []
 
-    for symptom, data in symptom_json.items():
+    for symptom, data in symptoms.items():
 
-        if isinstance(data, dict):
+        if not isinstance(data, dict):
+            continue
 
-            if data.get("present"):
+        if data.get("present"):
 
-                areas.append(
+            areas.append(
 
-                    symptom
-                    .replace("_"," ")
-                    .title()
+                symptom
+                .replace("_", " ")
+                .title()
 
-                )
-
+            )
 
     return areas[:top_k]
-
 
 
 # ==========================================================
@@ -131,78 +130,89 @@ def build_assessment(
 
 ):
 
+    # ------------------------------------------------------
+    # Apply symptom evidence using assessment_mapping
+    # ------------------------------------------------------
 
-    phq_items = parsed_response["phq9"]
+    mapped_scores = apply_symptom_evidence(
 
-    gad_items = parsed_response["gad7"]
+        parsed_response,
 
+        symptom_json
 
+    )
+
+    phq_items = mapped_scores["phq9"]
+
+    gad_items = mapped_scores["gad7"]
+
+    # ------------------------------------------------------
+    # Calculate Scores
+    # ------------------------------------------------------
 
     phq_score = sum(
         phq_items.values()
     )
 
-
     gad_score = sum(
         gad_items.values()
     )
 
-
+    # ------------------------------------------------------
+    # Calculate Severity
+    # ------------------------------------------------------
 
     phq_severity = phq9_severity(
         phq_score
     )
 
-
     gad_severity = gad7_severity(
         gad_score
     )
 
-
+    # ------------------------------------------------------
+    # Final JSON
+    # ------------------------------------------------------
 
     return {
 
-
         "generated_at":
+
         datetime.utcnow().isoformat(),
 
-
-
-        "phq9":{
+        "phq9": {
 
             "score":
+
             phq_score,
 
-
             "severity":
+
             phq_severity,
 
-
             "item_scores":
+
             phq_items
 
         },
 
-
-
-        "gad7":{
+        "gad7": {
 
             "score":
+
             gad_score,
 
-
             "severity":
+
             gad_severity,
 
-
             "item_scores":
+
             gad_items
 
         },
 
-
-
-        "overall_risk":{
+        "overall_risk": {
 
             "level":
 
@@ -216,10 +226,7 @@ def build_assessment(
 
         },
 
-
-
-        "wellness_insights":{
-
+        "wellness_insights": {
 
             "dominant_areas":
 
@@ -228,8 +235,6 @@ def build_assessment(
                 symptom_json
 
             ),
-
-
 
             "strengths":
 
@@ -241,8 +246,6 @@ def build_assessment(
 
             )
 
-
         }
-
 
     }
