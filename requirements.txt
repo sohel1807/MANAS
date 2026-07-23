@@ -7,4 +7,10 @@ uvicorn[standard]
 bcrypt
 modal
 streamlit
-
+sentence-transformers
+qdrant-client
+langchain
+langchain-community
+langchain-groq
+pypdf
+langchain-text-splitters
