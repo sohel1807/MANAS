@@ -50,21 +50,24 @@ def get_current_session(user_id, database_url):
         """
         SELECT
 
-        session_id,
+            session_id,
 
-        conversation_json,
+            conversation_json,
 
-        conversation_summary,
+            conversation_summary,
 
-        emotion_json,
+            emotion_json,
 
-        symptom_json,
+            symptom_json,
 
-        assessment_json,
+            assessment_json,
 
-        covered_topics
+            recommendation_json,
+
+            covered_topics
 
         FROM current_session
+
         WHERE user_id=%s
 
         AND status='IN_PROGRESS'
@@ -82,22 +85,15 @@ def get_current_session(user_id, database_url):
     if not row:
         return None
 
-    # ------------------------------------------------------
-    # Handle old sessions created before covered_topics
-    # was changed from list -> dictionary
-    # ------------------------------------------------------
-
-    assessment_json = row[5]
-
-    covered_topics = row[6]
-
-    if not isinstance(covered_topics, dict):
-        covered_topics = DEFAULT_COVERED_TOPICS.copy()
-
     conversation_summary = row[2]
 
     if not isinstance(conversation_summary, dict):
         conversation_summary = DEFAULT_SUMMARY.copy()
+
+    covered_topics = row[7]
+
+    if not isinstance(covered_topics, dict):
+        covered_topics = DEFAULT_COVERED_TOPICS.copy()
 
     return {
 
@@ -111,7 +107,9 @@ def get_current_session(user_id, database_url):
 
         "symptom_json": row[4] or {},
 
-        "assessment_json": assessment_json or {},
+        "assessment_json": row[5] or {},
+
+        "recommendation_json": row[6] or {},
 
         "covered_topics": covered_topics
 
@@ -141,6 +139,7 @@ def create_session(user_id, database_url):
             emotion_json,
             symptom_json,
             assessment_json,
+            recommendation_json,
             covered_topics,
             status
 
@@ -148,6 +147,7 @@ def create_session(user_id, database_url):
 
         VALUES(
 
+            %s,
             %s,
             %s,
             %s,
@@ -175,6 +175,8 @@ def create_session(user_id, database_url):
             json.dumps({}),          # symptom_json
 
             json.dumps({}),          # assessment_json
+
+            json.dumps({}),          # recommendation_json
 
             json.dumps(DEFAULT_COVERED_TOPICS),
 
@@ -301,7 +303,9 @@ def update_session_status(
         UPDATE current_session
 
         SET
+
             status=%s,
+
             updated_at=CURRENT_TIMESTAMP
 
         WHERE session_id=%s
@@ -319,8 +323,9 @@ def update_session_status(
 
     conn.close()
 
+
 # ==========================================================
-# Update Post Session Analysis
+# Update Post Session
 # ==========================================================
 
 def update_post_session(
@@ -339,7 +344,6 @@ def update_post_session(
     updates = []
     values = []
 
-
     if emotion_json is not None:
 
         updates.append("emotion_json=%s")
@@ -347,7 +351,6 @@ def update_post_session(
         values.append(
             json.dumps(emotion_json)
         )
-
 
     if symptom_json is not None:
 
@@ -357,7 +360,6 @@ def update_post_session(
             json.dumps(symptom_json)
         )
 
-
     if assessment_json is not None:
 
         updates.append("assessment_json=%s")
@@ -365,7 +367,6 @@ def update_post_session(
         values.append(
             json.dumps(assessment_json)
         )
-
 
     if recommendation_json is not None:
 
@@ -375,18 +376,11 @@ def update_post_session(
             json.dumps(recommendation_json)
         )
 
-
-    # Always update timestamp
-
     updates.append(
         "updated_at=CURRENT_TIMESTAMP"
     )
 
-
-    # Add WHERE condition value
-
     values.append(session_id)
-
 
     query = f"""
         UPDATE current_session
@@ -397,12 +391,10 @@ def update_post_session(
         WHERE session_id=%s
     """
 
-
     cur.execute(
         query,
         tuple(values)
     )
-
 
     conn.commit()
 

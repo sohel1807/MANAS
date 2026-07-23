@@ -6,7 +6,7 @@ import requests
 # ==========================================================
 
 ANALYSIS_AGENT_URL = (
-    "https://sohel1807--analysis-dev.modal.run"
+    "https://atharva7758--analysis.modal.run"
 )
 
 
@@ -15,7 +15,7 @@ ANALYSIS_AGENT_URL = (
 # ==========================================================
 
 ASSESSMENT_AGENT_URL = (
-    "https://sohel1807--assessment-dev.modal.run"
+    "https://atharva7758--assessment.modal.run"
 )
 
 
