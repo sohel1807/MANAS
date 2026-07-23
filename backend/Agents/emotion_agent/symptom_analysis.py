@@ -27,6 +27,27 @@ Rules:
 - Only extract symptoms explicitly supported by the user's own words.
 - Ignore greetings and casual conversation.
 - Do not include symptoms with weak evidence.
+- For every detected symptom, map it to the closest PHQ-9 and/or GAD-7 assessment item(s).
+
+Allowed PHQ-9 items:
+interest
+depressed_mood
+sleep
+energy
+appetite
+guilt
+concentration
+movement
+self_harm
+
+Allowed GAD-7 items:
+nervousness
+control_worry
+excessive_worry
+relaxing
+restlessness
+irritability
+fear
 
 For every symptom return:
 
@@ -34,6 +55,10 @@ For every symptom return:
     "present": true,
     "severity": "mild | moderate | severe",
     "confidence": 0.95,
+    "assessment_mapping": {
+        "phq9": [],
+        "gad7": []
+    },
     "evidence": [
         "Exact user statement"
     ]
@@ -46,8 +71,12 @@ Return JSON in the following format:
 
         "sleep_disturbance": {
             "present": true,
-            "severity": "...",
+            "severity": "moderate",
             "confidence": 0.93,
+            "assessment_mapping": {
+                "phq9": ["sleep"],
+                "gad7": []
+            },
             "evidence": []
         }
 
@@ -149,6 +178,30 @@ def parse_response(response_text):
             if isinstance(item, str) and item.strip()
         ]
 
+        mapping = symptom.get(
+            "assessment_mapping",
+            {}
+        )
+
+        if not isinstance(mapping, dict):
+            mapping = {}
+
+        phq9 = mapping.get(
+            "phq9",
+            []
+        )
+
+        gad7 = mapping.get(
+            "gad7",
+            []
+        )
+
+        if not isinstance(phq9, list):
+            phq9 = []
+
+        if not isinstance(gad7, list):
+            gad7 = []
+
         cleaned_symptoms[name] = {
 
             "present": bool(
@@ -162,14 +215,23 @@ def parse_response(response_text):
 
             "confidence": confidence,
 
+            "assessment_mapping": {
+
+                "phq9": phq9,
+
+                "gad7": gad7
+
+            },
+
             "evidence": evidence
 
         }
 
     return {
-        "symptoms": cleaned_symptoms
-    }
 
+        "symptoms": cleaned_symptoms
+
+    }
 
 # ==========================================================
 # Symptom Extraction
