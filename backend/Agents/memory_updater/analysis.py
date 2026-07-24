@@ -520,6 +520,10 @@ def generate_analysis(
 
         analysis = parse_analysis(result.content)
 
+        analysis["candidate_topics"] = get_candidate_topics(
+            analysis["covered_topics"]
+        )
+
         return analysis
 
     except Exception as e:
@@ -556,3 +560,45 @@ def load_groq_model(api_key):
         max_retries=2,
 
     )
+    
+    
+# ==========================================================
+# Candidate Topic Selector
+# ==========================================================
+
+def get_candidate_topics(covered_topics):
+
+    covered = set()
+
+    for section in ["general", "phq9", "gad7"]:
+        covered.update(covered_topics.get(section, []))
+
+    priority_order = {
+        "critical": 0,
+        "high": 1,
+        "medium": 2,
+        "low": 3
+    }
+
+    candidates = []
+
+    for topic in knowledge["topics"]:
+
+        if topic["id"] in covered:
+            continue
+
+        candidates.append({
+                "id": topic["id"],
+                "priority": topic.get("priority", "medium"),
+                "transition_hints": topic.get("transition_hints", [])
+            })
+    candidates.sort(
+
+        key=lambda x: priority_order.get(
+            x["priority"],
+            99
+        )
+
+    )
+
+    return candidates[:5]

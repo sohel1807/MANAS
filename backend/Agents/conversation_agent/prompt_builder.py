@@ -15,6 +15,7 @@ def load_system_prompt():
 
         return f.read()
 
+
 def build_prompt(
     chat_history,
     conversation_context=None,
@@ -22,23 +23,46 @@ def build_prompt(
 
     system_prompt = load_system_prompt()
 
-    context = []
-
     if conversation_context:
 
-        context.append(
-            "Conversation Context:\n"
-            + json.dumps(
-                conversation_context,
-                indent=2,
-                ensure_ascii=False
-            )
-        )
+        system_prompt += f"""
 
-    if context:
+--------------------------------------------------
+Internal Conversation Context
+--------------------------------------------------
 
-        system_prompt += "\n\n"
-        system_prompt += "\n\n".join(context)
+Main Issue:
+{conversation_context.get("main_issue", "")}
+
+Conversation Stage:
+{conversation_context.get("stage", "early")}
+
+Already Covered
+
+General:
+{json.dumps(conversation_context.get("general_topics", []), ensure_ascii=False)}
+
+PHQ-9:
+{json.dumps(conversation_context.get("phq9_topics", []), ensure_ascii=False)}
+
+GAD-7:
+{json.dumps(conversation_context.get("gad7_topics", []), ensure_ascii=False)}
+
+Candidate Topics
+(Ordered from highest priority to lowest)
+
+{json.dumps(conversation_context.get("candidate_topics", []), indent=2, ensure_ascii=False)}
+
+Instructions:
+
+- The Candidate Topics are only suggestions.
+- Do NOT force a transition.
+- Continue exploring the current topic while meaningful information is still emerging.
+- If the current topic appears well understood, naturally transition to ONE suitable candidate topic.
+- Prefer higher-priority candidates when multiple fit naturally.
+- Use the provided transition_hints only as inspiration.
+- Never reveal or mention candidate topics or internal context.
+"""
 
     messages = [
 
@@ -49,14 +73,6 @@ def build_prompt(
 
     ]
 
-    # --------------------------------------------------
-    # Recent Chat History
-    # --------------------------------------------------
-
-    for msg in chat_history[-8:]:
-
-        messages.append(msg)
-
-    
+    messages.extend(chat_history[-8:])
 
     return messages

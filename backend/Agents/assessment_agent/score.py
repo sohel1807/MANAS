@@ -41,6 +41,53 @@ def gad7_severity(score):
 
     return "Severe"
 
+# ==========================================================
+# Symptom Concern
+# ==========================================================
+
+def symptom_concern(symptom_json):
+
+    symptoms = symptom_json.get(
+        "symptoms",
+        symptom_json
+    )
+
+    highest = 0
+
+    severity_rank = {
+        "mild": 1,
+        "moderate": 2,
+        "severe": 3
+    }
+
+    for symptom in symptoms.values():
+
+        if not isinstance(symptom, dict):
+            continue
+
+        if not symptom.get("present"):
+            continue
+
+        severity = symptom.get(
+            "severity",
+            ""
+        ).lower()
+
+        highest = max(
+            highest,
+            severity_rank.get(severity, 0)
+        )
+
+    if highest == 3:
+        return "High"
+
+    if highest == 2:
+        return "Moderate"
+
+    if highest == 1:
+        return "Mild"
+
+    return "Low"
 
 # ==========================================================
 # Overall Risk
@@ -48,24 +95,35 @@ def gad7_severity(score):
 
 def overall_risk(
     phq_severity,
-    gad_severity
+    gad_severity,
+    symptom_level,
 ):
 
-    severity_rank = {
+    rank = {
+
+        "Low": 0,
 
         "Minimal": 0,
+
         "Mild": 1,
+
         "Moderate": 2,
+
         "Moderately Severe": 3,
-        "Severe": 4
+
+        "Severe": 4,
+
+        "High": 4
 
     }
 
     highest = max(
 
-        severity_rank[phq_severity],
+        rank.get(phq_severity, 0),
 
-        severity_rank[gad_severity]
+        rank.get(gad_severity, 0),
+
+        rank.get(symptom_level, 0)
 
     )
 
@@ -170,6 +228,13 @@ def build_assessment(
         gad_score
     )
 
+ # ------------------------------------------------------
+    # Symptom Concern Level
+    # ------------------------------------------------------
+
+    symptom_level = symptom_concern(
+        symptom_json
+    )
     # ------------------------------------------------------
     # Final JSON
     # ------------------------------------------------------
@@ -214,15 +279,17 @@ def build_assessment(
 
         "overall_risk": {
 
-            "level":
-
-            overall_risk(
+            "level": overall_risk(
 
                 phq_severity,
 
-                gad_severity
+                gad_severity,
 
-            )
+                symptom_level
+
+            ),
+
+            "symptom_concern": symptom_level
 
         },
 

@@ -15,7 +15,7 @@ ANALYSIS_AGENT_URL = (
 # ==========================================================
 
 ASSESSMENT_AGENT_URL = (
-    "https://atharva7758--assessment.modal.run"
+    "https://sohel1807--assessment.modal.run"
 )
 
 
