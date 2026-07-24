@@ -1,11 +1,12 @@
 import streamlit as st
 import requests
-
+from components.sidebar import app_sidebar
 
 st.set_page_config(
-    page_title="MANAS AI"
+    page_title="MANAS AI",
+    page_icon="🧠",
+    layout="wide"
 )
-
 
 # ==========================
 # Session State
@@ -31,8 +32,11 @@ if "session_stopped" not in st.session_state:
 if not st.session_state.logged_in:
 
 
-    st.title("MANAS AI")
+    st.title("🧠 MANAS AI")
 
+    st.caption(
+        "Adaptive Mental Wellness Assessment System"
+    )
 
     tab1, tab2 = st.tabs(
         ["Login", "Register"]
@@ -151,14 +155,24 @@ if not st.session_state.logged_in:
 else:
 
 
-    st.title("MANAS AI")
+    # ==========================
+    # Sidebar
+    # ==========================
+
+    app_sidebar()
 
 
-    if st.button("Logout"):
+    # ==========================
+    # Header
+    # ==========================
 
-        st.session_state.clear()
+    st.title("🧠 MANAS AI")
 
-        st.rerun()
+    st.caption(
+        "Adaptive Mental Wellness Assessment System"
+    )
+
+    st.divider()
 
 
 
@@ -166,13 +180,28 @@ else:
 
     for msg in st.session_state.messages:
 
-        with st.chat_message(
-            msg["role"]
-        ):
+        if msg["role"]=="user":
 
-            st.write(
-                msg["content"]
-            )
+            with st.chat_message(
+                "user",
+                avatar="🙂"
+            ):
+
+                st.markdown(
+                    msg["content"]
+                )
+
+
+        else:
+
+            with st.chat_message(
+                "assistant",
+                avatar="🧠"
+            ):
+
+                st.markdown(
+                    msg["content"]
+                )
 
 
 
@@ -185,12 +214,12 @@ else:
 
 
         if st.button(
-            "Stop Session & Generate Analysis"
+            "🛑 Finish Assessment"
         ):
 
 
             response=requests.post(
-                "https://atharva7758--stop-session.modal.run",
+                "https://sohel1807--stop-session-dev.modal.run",
                 json={
                     "user_id":
                     st.session_state.user_id
@@ -206,23 +235,18 @@ else:
 
 
             if data["status"]=="PROCESSING":
-
-
                 st.session_state.session_stopped=True
-
-
-                st.info(
-                    "Session stopped. Analysis is processing..."
+                st.switch_page(
+                        "pages/processing.py"
                 )
-
 
 
     else:
 
 
-        st.warning(
-            "Your session is under analysis. Please wait..."
-        )
+        st.info(
+                "🧠 Your assessment is being prepared. Please wait..."
+            )
 
 
         # Later use this API to check status
@@ -269,17 +293,28 @@ else:
 
 
 
-            response=requests.post(
-                "https://atharva7758--chat.modal.run",
-                json={
-                    "user_id":
-                    st.session_state.user_id,
+            thinking = st.empty()
 
-                    "message":
-                    user_input
-                }
+            thinking.info(
+                "🧠 Understanding your response..."
             )
 
+
+            with st.spinner("Generating response..."):
+
+                response=requests.post(
+                    "https://sohel1807--chat-dev.modal.run",
+                    json={
+                        "user_id":
+                        st.session_state.user_id,
+
+                        "message":
+                        user_input
+                    }
+                )
+
+
+            thinking.empty()
 
 
 

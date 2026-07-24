@@ -401,3 +401,78 @@ def update_post_session(
     cur.close()
 
     conn.close()
+    
+# ==========================================================
+# Get Latest Session
+# ==========================================================
+
+def get_latest_session(user_id, database_url):
+
+    conn = get_connection(database_url)
+
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT
+
+            session_id,
+            status,
+            conversation_json,
+            conversation_summary,
+            emotion_json,
+            symptom_json,
+            assessment_json,
+            recommendation_json,
+            covered_topics
+
+        FROM current_session
+
+        WHERE user_id=%s
+
+        ORDER BY updated_at DESC
+
+        LIMIT 1
+        """,
+        (user_id,)
+    )
+
+    row = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    if not row:
+        return None
+
+    conversation_summary = row[3]
+
+    if not isinstance(conversation_summary, dict):
+        conversation_summary = DEFAULT_SUMMARY.copy()
+
+    covered_topics = row[8]
+
+    if not isinstance(covered_topics, dict):
+        covered_topics = DEFAULT_COVERED_TOPICS.copy()
+
+    return {
+
+        "session_id": str(row[0]),
+
+        "status": row[1],
+
+        "conversation": row[2] or [],
+
+        "conversation_summary": conversation_summary,
+
+        "emotion_json": row[4] or {},
+
+        "symptom_json": row[5] or {},
+
+        "assessment_json": row[6] or {},
+
+        "recommendation_json": row[7] or {},
+
+        "covered_topics": covered_topics
+
+    }

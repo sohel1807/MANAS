@@ -1,4 +1,5 @@
 import requests
+
 from langchain_groq import ChatGroq
 
 from prompt_builder import build_prompt
@@ -16,10 +17,11 @@ model = None
 # Memory Agent Endpoint
 # ==========================================================
 
-MEMORY_API = "https://atharva7758--memory.modal.run"
+MEMORY_API = "https://sohel1807--memory-dev.modal.run"
 
 
 def chat(user_id, message, api_key, database_url):
+
     global model
 
     # --------------------------------------------------
@@ -29,8 +31,11 @@ def chat(user_id, message, api_key, database_url):
     if model is None:
 
         model = ChatGroq(
+
             model_name="llama-3.3-70b-versatile",
+
             api_key=api_key,
+
         )
 
     # --------------------------------------------------
@@ -38,31 +43,47 @@ def chat(user_id, message, api_key, database_url):
     # --------------------------------------------------
 
     session = get_current_session(
+
         user_id,
+
         database_url
+
     )
 
     if session is None:
 
         session_id = create_session(
+
             user_id,
+
             database_url
+
         )
 
         conversation = []
 
         conversation_summary = {
+
             "main_issue": "",
+
             "overall_summary": "",
+
             "current_stage": "early",
+
             "protective_factors": [],
+
             "risk_observations": []
+
         }
 
         covered_topics = {
+
             "general": [],
+
             "phq9": [],
+
             "gad7": []
+
         }
 
     else:
@@ -72,30 +93,47 @@ def chat(user_id, message, api_key, database_url):
         conversation = session["conversation"]
 
         conversation_summary = session.get(
+
             "conversation_summary",
+
             {
+
                 "main_issue": "",
+
                 "overall_summary": "",
+
                 "current_stage": "early",
+
                 "protective_factors": [],
+
                 "risk_observations": []
+
             }
+
         )
 
         covered_topics = session.get(
+
             "covered_topics",
+
             {
+
                 "general": [],
+
                 "phq9": [],
+
                 "gad7": []
+
             }
+
         )
 
     # --------------------------------------------------
-    # Use Only Recent Conversation
+    # Recent Conversation
     # --------------------------------------------------
 
     recent_conversation = (
+
         conversation
         + [
             {
@@ -103,50 +141,11 @@ def chat(user_id, message, api_key, database_url):
                 "content": message
             }
         ]
+
     )[-8:]
 
     # --------------------------------------------------
-    # Build Prompt
-    # --------------------------------------------------
-
-    conversation_context = build_conversation_context(
-        conversation_summary,
-        covered_topics,
-    )
-
-    messages = build_prompt(
-        chat_history=recent_conversation,
-        conversation_context=conversation_context,
-    )
-
-    # --------------------------------------------------
-    # Generate Assistant Response
-    # --------------------------------------------------
-
-    result = model.invoke(messages)
-
-    assistant_reply = result.content
-
-    # --------------------------------------------------
-    # Update Conversation History
-    # --------------------------------------------------
-
-    conversation.append(
-        {
-            "role": "user",
-            "content": message,
-        }
-    )
-
-    conversation.append(
-        {
-            "role": "assistant",
-            "content": assistant_reply,
-        }
-    )
-
-    # --------------------------------------------------
-    # Memory Update
+    # Memory Update FIRST
     # --------------------------------------------------
 
     try:
@@ -157,7 +156,7 @@ def chat(user_id, message, api_key, database_url):
 
             json={
 
-                "recent_messages": conversation[-8:],
+                "recent_messages": recent_conversation,
 
                 "conversation_summary": conversation_summary,
 
@@ -165,7 +164,7 @@ def chat(user_id, message, api_key, database_url):
 
             },
 
-            timeout=60,
+            timeout=100,
 
         )
 
@@ -178,12 +177,79 @@ def chat(user_id, message, api_key, database_url):
         print(f"Memory Agent Error: {e}")
 
         analysis = {
+
             "conversation_summary": conversation_summary,
+
             "covered_topics": covered_topics,
+
+            "candidate_topics": []
+
         }
 
     # --------------------------------------------------
-    # Save Updated Conversation + Memory
+    # Build Conversation Context
+    # --------------------------------------------------
+
+    conversation_context = build_conversation_context(
+
+        analysis["conversation_summary"],
+
+        analysis["covered_topics"],
+
+        analysis.get("candidate_topics", [])
+
+    )
+
+    # --------------------------------------------------
+    # Build Prompt
+    # --------------------------------------------------
+
+    messages = build_prompt(
+
+        chat_history=recent_conversation,
+
+        conversation_context=conversation_context,
+
+    )
+
+    # --------------------------------------------------
+    # Generate Assistant Response
+    # --------------------------------------------------
+
+    result = model.invoke(messages)
+
+    assistant_reply = result.content
+
+    # --------------------------------------------------
+    # Update Conversation
+    # --------------------------------------------------
+
+    conversation.append(
+
+        {
+
+            "role": "user",
+
+            "content": message,
+
+        }
+
+    )
+
+    conversation.append(
+
+        {
+
+            "role": "assistant",
+
+            "content": assistant_reply,
+
+        }
+
+    )
+
+    # --------------------------------------------------
+    # Save Conversation + Memory
     # --------------------------------------------------
 
     update_conversation(
@@ -199,7 +265,7 @@ def chat(user_id, message, api_key, database_url):
     )
 
     # --------------------------------------------------
-    # Return Assistant Reply
+    # Return Reply
     # --------------------------------------------------
 
     return assistant_reply

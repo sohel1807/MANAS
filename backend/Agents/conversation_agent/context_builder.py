@@ -1,14 +1,22 @@
+# ==========================================================
+# Build Conversation Context
+# ==========================================================
+
 def build_conversation_context(
 
     conversation_summary,
 
     covered_topics,
 
+    candidate_topics,
+
 ):
 
     conversation_summary = conversation_summary or {}
 
     covered_topics = covered_topics or {}
+
+    candidate_topics = candidate_topics or []
 
     return {
 
@@ -35,6 +43,8 @@ def build_conversation_context(
         "gad7_topics": covered_topics.get(
             "gad7",
             []
-        )
+        ),
+
+        "candidate_topics": candidate_topics
 
     }
