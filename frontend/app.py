@@ -219,7 +219,7 @@ else:
 
 
             response=requests.post(
-                "https://sohel1807--stop-session-dev.modal.run",
+                "https://sohel1807--stop-session.modal.run",
                 json={
                     "user_id":
                     st.session_state.user_id
@@ -303,7 +303,7 @@ else:
             with st.spinner("Generating response..."):
 
                 response=requests.post(
-                    "https://sohel1807--chat-dev.modal.run",
+                    "https://sohel1807--chat.modal.run",
                     json={
                         "user_id":
                         st.session_state.user_id,
