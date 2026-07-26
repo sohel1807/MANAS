@@ -87,7 +87,7 @@ while True:
 
 
         response = requests.get(
-            " https://sohel1807--session-status-dev.modal.run",
+            " https://sohel1807--session-status.modal.run",
             params={
                 "user_id":
                 st.session_state.user_id

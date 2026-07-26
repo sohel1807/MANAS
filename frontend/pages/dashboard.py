@@ -34,7 +34,7 @@ app_sidebar()
 # ============================================
 
 DASHBOARD_API = (
-    "https://sohel1807--dashboard-dev.modal.run"
+    "https://sohel1807--dashboard.modal.run"
 )
 
 
