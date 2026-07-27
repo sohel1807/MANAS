@@ -15,14 +15,11 @@ st.set_page_config(
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
-
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-
 if "session_stopped" not in st.session_state:
     st.session_state.session_stopped = False
-
 
 
 # ==========================
@@ -30,7 +27,6 @@ if "session_stopped" not in st.session_state:
 # ==========================
 
 if not st.session_state.logged_in:
-
 
     st.title("🧠 MANAS AI")
 
@@ -42,9 +38,7 @@ if not st.session_state.logged_in:
         ["Login", "Register"]
     )
 
-
     with tab1:
-
 
         email = st.text_input(
             "Email",
@@ -57,9 +51,7 @@ if not st.session_state.logged_in:
             key="login_password"
         )
 
-
         if st.button("Login"):
-
 
             response = requests.post(
                 "https://sohel1807--login.modal.run",
@@ -69,17 +61,18 @@ if not st.session_state.logged_in:
                 }
             )
 
-
             data = response.json()
-
 
             if "user_id" in data:
 
-
                 st.session_state.logged_in = True
-
                 st.session_state.user_id = data["user_id"]
 
+                st.session_state.messages = []
+                st.session_state.session_stopped = False
+
+                # Remove opened history report
+                st.session_state.pop("history_data", None)
 
                 st.success(
                     "Login Successful"
@@ -87,29 +80,23 @@ if not st.session_state.logged_in:
 
                 st.rerun()
 
-
             else:
 
                 st.error(
                     data["message"]
                 )
 
-
-
     with tab2:
-
 
         name = st.text_input(
             "Name",
             key="register_name"
         )
 
-
         email = st.text_input(
             "Email",
             key="register_email"
         )
-
 
         password = st.text_input(
             "Password",
@@ -117,9 +104,7 @@ if not st.session_state.logged_in:
             key="register_password"
         )
 
-
         if st.button("Register"):
-
 
             response = requests.post(
                 "https://sohel1807--register.modal.run",
@@ -130,11 +115,9 @@ if not st.session_state.logged_in:
                 }
             )
 
+            data = response.json()
 
-            data=response.json()
-
-
-            if data["message"]=="Registration Successful":
+            if data["message"] == "Registration Successful":
 
                 st.success(
                     data["message"]
@@ -147,24 +130,13 @@ if not st.session_state.logged_in:
                 )
 
 
-
 # ==========================
 # Chat Page
 # ==========================
 
 else:
 
-
-    # ==========================
-    # Sidebar
-    # ==========================
-
     app_sidebar()
-
-
-    # ==========================
-    # Header
-    # ==========================
 
     st.title("🧠 MANAS AI")
 
@@ -174,13 +146,23 @@ else:
 
     st.divider()
 
+    # ==========================
+    # Viewing History Banner
+    # ==========================
 
+    if "history_data" in st.session_state:
 
-    # Show chat history
+        st.info(
+            "📜 You are viewing a previous assessment report."
+        )
+
+    # ==========================
+    # Chat Messages
+    # ==========================
 
     for msg in st.session_state.messages:
 
-        if msg["role"]=="user":
+        if msg["role"] == "user":
 
             with st.chat_message(
                 "user",
@@ -190,7 +172,6 @@ else:
                 st.markdown(
                     msg["content"]
                 )
-
 
         else:
 
@@ -203,22 +184,17 @@ else:
                     msg["content"]
                 )
 
-
-
     # ==========================
-    # Stop Session
+    # Finish Assessment
     # ==========================
-
 
     if not st.session_state.session_stopped:
-
 
         if st.button(
             "🛑 Finish Assessment"
         ):
 
-
-            response=requests.post(
+            response = requests.post(
                 "https://sohel1807--stop-session.modal.run",
                 json={
                     "user_id":
@@ -226,72 +202,46 @@ else:
                 }
             )
 
+            data = response.json()
 
-            #print(response.status_code)
-            #print(response.text)
+            if data["status"] == "PROCESSING":
 
-            data=response.json()
+                st.session_state.session_stopped = True
 
-
-
-            if data["status"]=="PROCESSING":
-                st.session_state.session_stopped=True
                 st.switch_page(
-                        "pages/processing.py"
+                    "pages/processing.py"
                 )
-
 
     else:
 
-
         st.info(
-                "🧠 Your assessment is being prepared. Please wait..."
-            )
-
-
-        # Later use this API to check status
-        # status_response=requests.get(
-        #     "https://sohel1807--session-status.modal.run",
-        #     params={
-        #       "user_id":st.session_state.user_id
-        #     }
-        # )
-
-
-        # if status_response.json()["status"]=="COMPLETED":
-        #
-        #      st.success("Assessment completed")
-        #
-        #      st.write(
-        #          status_response.json()["analysis"]
-        #      )
-
-
+            "🧠 Your assessment is being prepared. Please wait..."
+        )
 
     # ==========================
     # Chat Input
     # ==========================
 
-
-    if not st.session_state.session_stopped:
-
+    if (
+        not st.session_state.session_stopped
+        and "history_data" not in st.session_state
+    ):
 
         user_input = st.chat_input(
             "Type here..."
         )
 
-
         if user_input:
 
+            # Leaving history report
+            st.session_state.pop("history_data", None)
 
             st.session_state.messages.append(
                 {
-                    "role":"user",
-                    "content":user_input
+                    "role": "user",
+                    "content": user_input
                 }
             )
-
-
 
             thinking = st.empty()
 
@@ -299,10 +249,11 @@ else:
                 "🧠 Understanding your response..."
             )
 
+            with st.spinner(
+                "Generating response..."
+            ):
 
-            with st.spinner("Generating response..."):
-
-                response=requests.post(
+                response = requests.post(
                     "https://sohel1807--chat.modal.run",
                     json={
                         "user_id":
@@ -313,29 +264,17 @@ else:
                     }
                 )
 
-
             thinking.empty()
 
+            data = response.json()
 
-
-            # print(response.status_code)
-            # print(response.text)
-
-            data=response.json()
-
-           
-
-
-            reply=data["reply"]
-
-
+            reply = data["reply"]
 
             st.session_state.messages.append(
                 {
-                    "role":"assistant",
-                    "content":reply
+                    "role": "assistant",
+                    "content": reply
                 }
             )
-
 
             st.rerun()

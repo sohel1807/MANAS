@@ -44,20 +44,22 @@ DASHBOARD_API = (
 
 with st.spinner("Loading assessment report..."):
 
-    response = requests.get(
-        DASHBOARD_API,
-        params={
-            "user_id": st.session_state.user_id
-        }
-    )
+    params = {}
 
-    if response.status_code != 200:
+    if "history_data" in st.session_state:
 
-        st.error("Unable to load dashboard.")
+        data = st.session_state.history_data
 
-        st.stop()
+    else:
 
-    data = response.json()
+        response = requests.get(
+            DASHBOARD_API,
+            params={
+                "user_id": st.session_state.user_id
+            }
+        )
+
+        data = response.json()
 
 
 if data["status"] != "COMPLETED":
@@ -134,13 +136,28 @@ with col1:
 
     if st.button("➕ New Assessment"):
 
-        st.info("Coming Soon")
+        response = requests.post(
+            "https://sohel1807--new-session.modal.run",
+            json={
+                "user_id": st.session_state.user_id
+            }
+        )
+
+        if response.status_code == 200:
+
+            st.session_state.messages = []
+            st.session_state.session_stopped = False
+
+            if "history_data" in st.session_state:
+                del st.session_state["history_data"]
+
+            st.switch_page("app.py")
 
 with col2:
 
     if st.button("📜 History"):
 
-        st.info("Coming Soon")
+        st.switch_page("pages/history.py")
 
 with col3:
 

@@ -1,3 +1,4 @@
+import requests
 import streamlit as st
 
 
@@ -37,9 +38,20 @@ def app_sidebar():
             "➕ New Assessment",
             use_container_width=True
         ):
-            st.info(
-                "Coming Soon"
-            )
+
+            response = requests.post(
+                "https://sohel1807--new-session.modal.run",
+                json={
+                "user_id": st.session_state.user_id
+            }
+        )
+
+            if response.status_code == 200:
+
+                st.session_state.messages = []
+                st.session_state.session_stopped = False
+
+                st.switch_page("app.py")
 
         st.divider()
 

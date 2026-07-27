@@ -4,8 +4,16 @@ import os
 
 from database.session import (
     get_latest_session,
-    update_session_status,get_current_session
+    get_current_session,
+    create_session,
+    delete_current_session,
+    update_session_status
 )
+
+from database.history import (
+    save_to_history,get_history,get_history_report
+)
+
 
 from post_session.processor import process_session
 
@@ -162,7 +170,8 @@ def dashboard(user_id: int):
 
     session = get_latest_session(
         user_id,
-        database_url
+        database_url,
+        "COMPLETED"
     )
 
     if session is None:
@@ -173,3 +182,118 @@ def dashboard(user_id: int):
         }
 
     return session
+
+
+# ==========================================================
+# New Session Endpoint
+# ==========================================================
+
+@app.function(
+    secrets=[
+        modal.Secret.from_name("DATABASE_URL")
+    ]
+)
+@modal.fastapi_endpoint(
+    method="POST",
+    label="new-session"
+)
+def new_session(info: dict):
+
+    database_url = os.environ["DATABASE_URL"]
+
+    user_id = info["user_id"]
+
+    # Check if completed session exists
+    session = get_latest_session(
+        user_id,
+        database_url,
+        status="COMPLETED"
+    )
+
+    if session is not None:
+
+        # Save to history
+        save_to_history(
+            session,
+            database_url
+        )
+
+        # Remove from current_session
+        delete_current_session(
+            session["session_id"],
+            database_url
+        )
+
+    # Create fresh session
+    session_id = create_session(
+        user_id,
+        database_url
+    )
+
+    return {
+
+        "status": "SUCCESS",
+
+        "session_id": session_id
+
+    }
+
+# ==========================================================
+# History List
+# ==========================================================
+
+@app.function(
+    secrets=[
+        modal.Secret.from_name("DATABASE_URL")
+    ]
+)
+@modal.fastapi_endpoint(
+    method="GET",
+    label="history"
+)
+def history(user_id: int):
+
+    database_url = os.environ["DATABASE_URL"]
+
+    history = get_history(
+        user_id,
+        database_url
+    )
+
+    return history
+
+# ==========================================================
+# History Report
+# ==========================================================
+
+@app.function(
+    secrets=[
+        modal.Secret.from_name("DATABASE_URL")
+    ]
+)
+@modal.fastapi_endpoint(
+    method="GET",
+    label="history-report"
+)
+def history_report(history_id: str):
+
+    database_url = os.environ["DATABASE_URL"]
+
+    report = get_history_report(
+        history_id,
+        database_url
+    )
+
+    if report is None:
+
+        return {
+            "status": "FAILED",
+            "message": "History report not found"
+        }
+
+    report["status"] = "COMPLETED"
+
+    return report
+    
+    
+    
