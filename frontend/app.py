@@ -184,33 +184,53 @@ else:
                     msg["content"]
                 )
 
+    # Count only user messages
+
+    user_message_count = sum(
+        1
+        for msg in st.session_state.messages
+        if msg["role"] == "user"
+    )
     # ==========================
     # Finish Assessment
     # ==========================
 
     if not st.session_state.session_stopped:
 
-        if st.button(
-            "🛑 Finish Assessment"
-        ):
+        if user_message_count < 5:
 
-            response = requests.post(
-                "https://sohel1807--stop-session.modal.run",
-                json={
-                    "user_id":
-                    st.session_state.user_id
-                }
+            st.info(
+                f"Please answer at least {5-user_message_count} more question(s) before finishing the assessment."
             )
 
-            data = response.json()
+            st.button(
+                "🛑 Finish Assessment",
+                disabled=True
+            )
 
-            if data["status"] == "PROCESSING":
+        else:
 
-                st.session_state.session_stopped = True
+            if st.button(
+                "🛑 Finish Assessment"
+            ):
 
-                st.switch_page(
-                    "pages/processing.py"
+                response = requests.post(
+                    "https://sohel1807--stop-session.modal.run",
+                    json={
+                        "user_id":
+                        st.session_state.user_id
+                    }
                 )
+
+                data = response.json()
+
+                if data["status"] == "PROCESSING":
+
+                    st.session_state.session_stopped = True
+
+                    st.switch_page(
+                        "pages/processing.py"
+                    )
 
     else:
 
