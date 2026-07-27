@@ -199,10 +199,6 @@ else:
 
         if user_message_count < 5:
 
-            st.info(
-                f"Please answer at least {5-user_message_count} more question(s) before finishing the assessment."
-            )
-
             st.button(
                 "🛑 Finish Assessment",
                 disabled=True
