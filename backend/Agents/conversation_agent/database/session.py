@@ -406,36 +406,80 @@ def update_post_session(
 # Get Latest Session
 # ==========================================================
 
-def get_latest_session(user_id, database_url):
+# ==========================================================
+# Get Latest Session
+# ==========================================================
+
+def get_latest_session(
+    user_id,
+    database_url,
+    status=None
+):
 
     conn = get_connection(database_url)
 
     cur = conn.cursor()
 
-    cur.execute(
-        """
-        SELECT
+    if status is None:
 
-            session_id,
-            status,
-            conversation_json,
-            conversation_summary,
-            emotion_json,
-            symptom_json,
-            assessment_json,
-            recommendation_json,
-            covered_topics
+        cur.execute(
+            """
+            SELECT
 
-        FROM current_session
+                session_id,
+                user_id,
+                status,
+                conversation_json,
+                conversation_summary,
+                emotion_json,
+                symptom_json,
+                assessment_json,
+                recommendation_json,
+                covered_topics
 
-        WHERE user_id=%s
+            FROM current_session
 
-        ORDER BY updated_at DESC
+            WHERE user_id=%s
 
-        LIMIT 1
-        """,
-        (user_id,)
-    )
+            ORDER BY updated_at DESC
+
+            LIMIT 1
+            """,
+            (user_id,)
+        )
+
+    else:
+
+        cur.execute(
+            """
+            SELECT
+
+                session_id,
+                user_id,
+                status,
+                conversation_json,
+                conversation_summary,
+                emotion_json,
+                symptom_json,
+                assessment_json,
+                recommendation_json,
+                covered_topics
+
+            FROM current_session
+
+            WHERE user_id=%s
+
+            AND status=%s
+
+            ORDER BY updated_at DESC
+
+            LIMIT 1
+            """,
+            (
+                user_id,
+                status
+            )
+        )
 
     row = cur.fetchone()
 
@@ -445,12 +489,12 @@ def get_latest_session(user_id, database_url):
     if not row:
         return None
 
-    conversation_summary = row[3]
+    conversation_summary = row[4]
 
     if not isinstance(conversation_summary, dict):
         conversation_summary = DEFAULT_SUMMARY.copy()
 
-    covered_topics = row[8]
+    covered_topics = row[9]
 
     if not isinstance(covered_topics, dict):
         covered_topics = DEFAULT_COVERED_TOPICS.copy()
@@ -459,20 +503,51 @@ def get_latest_session(user_id, database_url):
 
         "session_id": str(row[0]),
 
-        "status": row[1],
+        "user_id": row[1],
 
-        "conversation": row[2] or [],
+        "status": row[2],
+
+        "conversation": row[3] or [],
 
         "conversation_summary": conversation_summary,
 
-        "emotion_json": row[4] or {},
+        "emotion_json": row[5] or {},
 
-        "symptom_json": row[5] or {},
+        "symptom_json": row[6] or {},
 
-        "assessment_json": row[6] or {},
+        "assessment_json": row[7] or {},
 
-        "recommendation_json": row[7] or {},
+        "recommendation_json": row[8] or {},
 
         "covered_topics": covered_topics
 
     }
+    
+    # ==========================================================
+# Delete Current Session
+# ==========================================================
+
+def delete_current_session(
+    session_id,
+    database_url
+):
+
+    conn = get_connection(database_url)
+
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        DELETE FROM current_session
+
+        WHERE session_id=%s
+        """,
+
+        (session_id,)
+    )
+
+    conn.commit()
+
+    cur.close()
+
+    conn.close()
