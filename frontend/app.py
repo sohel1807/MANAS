@@ -1,0 +1,296 @@
+import streamlit as st
+import requests
+from components.sidebar import app_sidebar
+
+st.set_page_config(
+    page_title="MANAS AI",
+    page_icon="🧠",
+    layout="wide"
+)
+
+# ==========================
+# Session State
+# ==========================
+
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+if "session_stopped" not in st.session_state:
+    st.session_state.session_stopped = False
+
+
+# ==========================
+# Login/Register
+# ==========================
+
+if not st.session_state.logged_in:
+
+    st.title("🧠 MANAS AI")
+
+    st.caption(
+        "Adaptive Mental Wellness Assessment System"
+    )
+
+    tab1, tab2 = st.tabs(
+        ["Login", "Register"]
+    )
+
+    with tab1:
+
+        email = st.text_input(
+            "Email",
+            key="login_email"
+        )
+
+        password = st.text_input(
+            "Password",
+            type="password",
+            key="login_password"
+        )
+
+        if st.button("Login"):
+
+            response = requests.post(
+                "https://sohel1807--login.modal.run",
+                json={
+                    "email": email,
+                    "password": password
+                }
+            )
+
+            data = response.json()
+
+            if "user_id" in data:
+
+                st.session_state.logged_in = True
+                st.session_state.user_id = data["user_id"]
+
+                st.session_state.messages = []
+                st.session_state.session_stopped = False
+
+                # Remove opened history report
+                st.session_state.pop("history_data", None)
+
+                st.success(
+                    "Login Successful"
+                )
+
+                st.rerun()
+
+            else:
+
+                st.error(
+                    data["message"]
+                )
+
+    with tab2:
+
+        name = st.text_input(
+            "Name",
+            key="register_name"
+        )
+
+        email = st.text_input(
+            "Email",
+            key="register_email"
+        )
+
+        password = st.text_input(
+            "Password",
+            type="password",
+            key="register_password"
+        )
+
+        if st.button("Register"):
+
+            response = requests.post(
+                "https://sohel1807--register.modal.run",
+                json={
+                    "name": name,
+                    "email": email,
+                    "password": password
+                }
+            )
+
+            data = response.json()
+
+            if data["message"] == "Registration Successful":
+
+                st.success(
+                    data["message"]
+                )
+
+            else:
+
+                st.error(
+                    data["message"]
+                )
+
+
+# ==========================
+# Chat Page
+# ==========================
+
+else:
+
+    app_sidebar()
+
+    st.title("🧠 MANAS AI")
+
+    st.caption(
+        "Adaptive Mental Wellness Assessment System"
+    )
+
+    st.divider()
+
+    # ==========================
+    # Viewing History Banner
+    # ==========================
+
+    if "history_data" in st.session_state:
+
+        st.info(
+            "📜 You are viewing a previous assessment report."
+        )
+
+    # ==========================
+    # Chat Messages
+    # ==========================
+
+    for msg in st.session_state.messages:
+
+        if msg["role"] == "user":
+
+            with st.chat_message(
+                "user",
+                avatar="🙂"
+            ):
+
+                st.markdown(
+                    msg["content"]
+                )
+
+        else:
+
+            with st.chat_message(
+                "assistant",
+                avatar="🧠"
+            ):
+
+                st.markdown(
+                    msg["content"]
+                )
+
+    # Count only user messages
+
+    user_message_count = sum(
+        1
+        for msg in st.session_state.messages
+        if msg["role"] == "user"
+    )
+    # ==========================
+    # Finish Assessment
+    # ==========================
+
+    if not st.session_state.session_stopped:
+
+        if user_message_count < 5:
+
+            st.button(
+                "🛑 Finish Assessment",
+                disabled=True
+            )
+
+        else:
+
+            if st.button(
+                "🛑 Finish Assessment"
+            ):
+
+                response = requests.post(
+                    "https://sohel1807--stop-session.modal.run",
+                    json={
+                        "user_id":
+                        st.session_state.user_id
+                    }
+                )
+
+                data = response.json()
+
+                if data["status"] == "PROCESSING":
+
+                    st.session_state.session_stopped = True
+
+                    st.switch_page(
+                        "pages/processing.py"
+                    )
+
+    else:
+
+        st.info(
+            "🧠 Your assessment is being prepared. Please wait..."
+        )
+
+    # ==========================
+    # Chat Input
+    # ==========================
+
+    if (
+        not st.session_state.session_stopped
+        and "history_data" not in st.session_state
+    ):
+
+        user_input = st.chat_input(
+            "Type here..."
+        )
+
+        if user_input:
+
+            # Leaving history report
+            st.session_state.pop("history_data", None)
+
+            st.session_state.messages.append(
+                {
+                    "role": "user",
+                    "content": user_input
+                }
+            )
+
+            thinking = st.empty()
+
+            thinking.info(
+                "🧠 Understanding your response..."
+            )
+
+            with st.spinner(
+                "Generating response..."
+            ):
+
+                response = requests.post(
+                    "https://sohel1807--chat.modal.run",
+                    json={
+                        "user_id":
+                        st.session_state.user_id,
+
+                        "message":
+                        user_input
+                    }
+                )
+
+            thinking.empty()
+
+            data = response.json()
+
+            reply = data["reply"]
+
+            st.session_state.messages.append(
+                {
+                    "role": "assistant",
+                    "content": reply
+                }
+            )
+
+            st.rerun()

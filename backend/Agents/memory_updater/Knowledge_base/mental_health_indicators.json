@@ -1,0 +1,750 @@
+{
+  "topics": [
+    {
+      "id": "current_situation",
+      "topic": "Current Situation",
+      "priority": "high",
+      "description": "The user's main concern or reason for starting the conversation.",
+      "completion_rule": "Understand the primary situation or concern in the user's own words.",
+      "keywords": [
+        "problem",
+        "issue",
+        "lately",
+        "recently",
+        "going through",
+        "struggling"
+      ],
+      "user_examples": [
+        "I've been struggling lately.",
+        "Life has been difficult.",
+        "Everything feels overwhelming."
+      ],
+      "related_topics": [
+        "stressors",
+        "mood",
+        "worry"
+      ],
+      "transition_hints": [
+        "Explore how this situation has affected the user.",
+        "Understand what changed."
+      ]
+    },
+    {
+      "id": "mood",
+      "topic": "Mood",
+      "priority": "high",
+      "description": "Persistent sadness, emotional low mood, emptiness or hopelessness.",
+      "completion_rule": "Need one meaningful statement describing emotional state.",
+      "keywords": [
+        "sad",
+        "down",
+        "low",
+        "hopeless",
+        "empty",
+        "depressed"
+      ],
+      "user_examples": [
+        "I've been feeling low.",
+        "I feel empty.",
+        "Nothing feels right."
+      ],
+      "related_topics": [
+        "interest",
+        "energy",
+        "support"
+      ],
+      "transition_hints": [
+        "Mood often affects daily life.",
+        "Mood changes may influence motivation."
+      ]
+    },
+    {
+      "id": "interest",
+      "topic": "Interest and Enjoyment",
+      "priority": "high",
+      "description": "Loss of motivation or enjoyment in previously enjoyable activities.",
+      "completion_rule": "Need one meaningful statement about enjoyment or motivation.",
+      "keywords": [
+        "interest",
+        "motivation",
+        "hobby",
+        "fun",
+        "enjoy"
+      ],
+      "user_examples": [
+        "Nothing excites me anymore.",
+        "I don't enjoy my hobbies."
+      ],
+      "related_topics": [
+        "mood",
+        "energy",
+        "daily_routine"
+      ],
+      "transition_hints": [
+        "Changes in motivation often affect routines."
+      ]
+    },
+    {
+      "id": "sleep",
+      "topic": "Sleep",
+      "priority": "high",
+      "description": "Changes in sleep quality, duration or routine.",
+      "completion_rule": "Need one meaningful statement about sleep.",
+      "keywords": [
+        "sleep",
+        "insomnia",
+        "awake",
+        "night",
+        "rest"
+      ],
+      "user_examples": [
+        "I barely sleep.",
+        "I wake up every night."
+      ],
+      "related_topics": [
+        "energy",
+        "stress",
+        "concentration"
+      ],
+      "transition_hints": [
+        "Sleep often affects daytime functioning."
+      ]
+    },
+    {
+      "id": "energy",
+      "topic": "Energy",
+      "priority": "high",
+      "description": "Fatigue, exhaustion or lack of energy.",
+      "completion_rule": "Need one meaningful statement describing energy.",
+      "keywords": [
+        "tired",
+        "fatigue",
+        "drained",
+        "energy"
+      ],
+      "user_examples": [
+        "I'm exhausted.",
+        "I feel tired all day."
+      ],
+      "related_topics": [
+        "sleep",
+        "daily_routine",
+        "work_study"
+      ],
+      "transition_hints": [
+        "Energy changes often affect productivity."
+      ]
+    },
+    {
+      "id": "appetite",
+      "topic": "Appetite",
+      "priority": "medium",
+      "description": "Changes in eating habits or appetite.",
+      "completion_rule": "Need one meaningful statement describing appetite.",
+      "keywords": [
+        "eat",
+        "food",
+        "hungry",
+        "appetite"
+      ],
+      "user_examples": [
+        "I'm not eating much.",
+        "I've lost my appetite."
+      ],
+      "related_topics": [
+        "energy",
+        "physical_health"
+      ],
+      "transition_hints": [
+        "Appetite changes sometimes accompany stress."
+      ]
+    },
+    {
+      "id": "concentration",
+      "topic": "Concentration",
+      "priority": "medium",
+      "description": "Difficulty focusing, remembering or making decisions.",
+      "completion_rule": "Need one meaningful statement describing concentration.",
+      "keywords": [
+        "focus",
+        "forget",
+        "memory",
+        "attention"
+      ],
+      "user_examples": [
+        "I can't focus.",
+        "I'm forgetting everything."
+      ],
+      "related_topics": [
+        "sleep",
+        "energy",
+        "work_study"
+      ],
+      "transition_hints": [
+        "Concentration often affects work or studies."
+      ]
+    },
+    {
+      "id": "self_worth",
+      "topic": "Self Worth",
+      "priority": "high",
+      "description": "Feelings of guilt, failure, worthlessness or self-blame.",
+      "completion_rule": "Need one meaningful statement about self-worth.",
+      "keywords": [
+        "worthless",
+        "failure",
+        "guilt",
+        "burden"
+      ],
+      "user_examples": [
+        "I feel like a failure.",
+        "Everyone would be better without me."
+      ],
+      "related_topics": [
+        "mood",
+        "support",
+        "safety"
+      ],
+      "transition_hints": [
+        "Self-perception can influence emotional wellbeing."
+      ]
+    },
+    {
+      "id": "daily_routine",
+      "topic": "Daily Routine",
+      "priority": "medium",
+      "description": "Changes in normal daily activities and functioning.",
+      "completion_rule": "Need one meaningful statement about daily routine.",
+      "keywords": [
+        "routine",
+        "day",
+        "daily",
+        "schedule"
+      ],
+      "user_examples": [
+        "I barely leave my room.",
+        "My routine has changed completely."
+      ],
+      "related_topics": [
+        "energy",
+        "interest",
+        "work_study"
+      ],
+      "transition_hints": [
+        "Daily routines often reflect overall wellbeing."
+      ]
+    },
+    {
+      "id": "nervousness",
+    "topic": "Nervousness and Anxiety",
+    "priority": "high",
+    "description": "Feeling nervous, anxious, tense, or on edge.",
+    "completion_rule": "Need at least one meaningful statement describing nervousness or anxiety.",
+    "keywords": [
+      "nervous",
+      "anxious",
+      "tense",
+      "panic",
+      "on edge",
+      "anxiety"
+    ],
+    "user_examples": [
+      "I've been feeling anxious all the time.",
+      "I'm always on edge.",
+      "I feel nervous for no reason."
+    ],
+    "related_topics": [
+      "worry",
+      "fear",
+      "relaxation",
+      "stressors"
+    ],
+    "transition_hints": [
+      "Feeling anxious often goes along with persistent worrying.",
+      "Some people notice physical tension when they feel anxious."
+    ]
+  },
+
+  {
+    "id": "worry",
+    "topic": "Excessive Worry",
+    "priority": "high",
+    "description": "Frequent worrying or overthinking about different situations.",
+    "completion_rule": "Need one meaningful statement describing excessive worry.",
+    "keywords": [
+      "worry",
+      "overthinking",
+      "concern",
+      "thinking too much"
+    ],
+    "user_examples": [
+      "I worry about everything.",
+      "I overthink every little thing.",
+      "My mind never stops."
+    ],
+    "related_topics": [
+      "worry_control",
+      "fear",
+      "sleep",
+      "concentration"
+    ],
+    "transition_hints": [
+      "Persistent worrying sometimes affects sleep.",
+      "It can also become difficult to concentrate."
+    ]
+  },
+
+  {
+    "id": "worry_control",
+    "topic": "Controlling Worry",
+    "priority": "high",
+    "description": "Difficulty stopping or controlling worrying thoughts.",
+    "completion_rule": "Need one meaningful statement describing inability to control worry.",
+    "keywords": [
+      "can't stop worrying",
+      "mind racing",
+      "can't control thoughts",
+      "thinking nonstop"
+    ],
+    "user_examples": [
+      "I can't stop worrying.",
+      "Once I start thinking I can't stop.",
+      "My thoughts keep racing."
+    ],
+    "related_topics": [
+      "worry",
+      "relaxation",
+      "sleep"
+    ],
+    "transition_hints": [
+      "Difficulty controlling worries often affects relaxation."
+    ]
+  },
+
+  {
+    "id": "relaxation",
+    "topic": "Relaxation",
+    "priority": "medium",
+    "description": "Difficulty relaxing or feeling calm.",
+    "completion_rule": "Need one meaningful statement about relaxation.",
+    "keywords": [
+      "relax",
+      "calm",
+      "tense",
+      "unwind"
+    ],
+    "user_examples": [
+      "I can't relax.",
+      "Even during weekends I stay tense.",
+      "I never feel calm."
+    ],
+    "related_topics": [
+      "worry",
+      "restlessness",
+      "sleep"
+    ],
+    "transition_hints": [
+      "Difficulty relaxing can influence sleep quality."
+    ]
+  },
+
+  {
+    "id": "restlessness",
+    "topic": "Restlessness",
+    "priority": "medium",
+    "description": "Feeling restless or unable to stay still.",
+    "completion_rule": "Need one meaningful statement describing restlessness.",
+    "keywords": [
+      "restless",
+      "can't sit still",
+      "fidget",
+      "uneasy"
+    ],
+    "user_examples": [
+      "I can't sit still.",
+      "I keep pacing around.",
+      "I always feel restless."
+    ],
+    "related_topics": [
+      "relaxation",
+      "nervousness",
+      "psychomotor"
+    ],
+    "transition_hints": [
+      "Restlessness sometimes appears together with anxiety."
+    ]
+  },
+
+  {
+    "id": "irritability",
+    "topic": "Irritability",
+    "priority": "medium",
+    "description": "Getting frustrated, annoyed, or angry more easily than usual.",
+    "completion_rule": "Need one meaningful statement describing irritability.",
+    "keywords": [
+      "angry",
+      "annoyed",
+      "irritable",
+      "frustrated"
+    ],
+    "user_examples": [
+      "Everything irritates me.",
+      "I've become short-tempered.",
+      "Small things make me angry."
+    ],
+    "related_topics": [
+      "stressors",
+      "relationships",
+      "mood"
+    ],
+    "transition_hints": [
+      "Irritability can affect interactions with other people."
+    ]
+  },
+
+  {
+    "id": "fear",
+    "topic": "Fear",
+    "priority": "medium",
+    "description": "Persistent fear that something bad may happen.",
+    "completion_rule": "Need one meaningful statement describing persistent fear.",
+    "keywords": [
+      "fear",
+      "afraid",
+      "worst",
+      "something bad"
+    ],
+    "user_examples": [
+      "I always expect the worst.",
+      "I'm scared something bad will happen.",
+      "I constantly feel afraid."
+    ],
+    "related_topics": [
+      "worry",
+      "nervousness"
+    ],
+    "transition_hints": [
+      "Fear often leads to persistent worrying."
+    ]
+  },
+
+  {
+    "id": "stressors",
+    "topic": "Stressors",
+    "priority": "high",
+    "description": "Events or situations that are contributing to the user's distress.",
+    "completion_rule": "Need at least one meaningful stressor identified.",
+    "keywords": [
+      "stress",
+      "pressure",
+      "problem",
+      "deadline",
+      "burden"
+    ],
+    "user_examples": [
+      "Work has been overwhelming.",
+      "College is stressful.",
+      "Family issues are exhausting."
+    ],
+    "related_topics": [
+      "work_study",
+      "relationships",
+      "major_life_events"
+    ],
+    "transition_hints": [
+      "Understanding the source of stress often helps explain other experiences."
+    ]
+  },
+
+  {
+    "id": "major_life_events",
+    "topic": "Major Life Events",
+    "priority": "medium",
+    "description": "Important changes or significant events affecting the user's life.",
+    "completion_rule": "Need one meaningful statement about a major recent life event.",
+    "keywords": [
+      "loss",
+      "breakup",
+      "job",
+      "moved",
+      "death",
+      "marriage",
+      "exam"
+    ],
+    "user_examples": [
+      "I recently lost my job.",
+      "My relationship ended.",
+      "I moved to another city."
+    ],
+    "related_topics": [
+      "stressors",
+      "mood",
+      "support"
+    ],
+    "transition_hints": [
+      "Major life events often influence emotional wellbeing."
+    ]
+  },
+  {
+    "id": "work_study",
+    "topic": "Work or Study",
+    "priority": "medium",
+    "description": "Experiences related to work, education, productivity, responsibilities, or performance.",
+    "completion_rule": "Need at least one meaningful statement describing work or academic experiences.",
+    "keywords": [
+      "work",
+      "office",
+      "job",
+      "college",
+      "school",
+      "study",
+      "exam",
+      "assignment",
+      "boss",
+      "career"
+    ],
+    "user_examples": [
+      "Work has been overwhelming.",
+      "I'm struggling with college.",
+      "I can't focus on my studies.",
+      "My workload is too much."
+    ],
+    "related_topics": [
+      "stressors",
+      "concentration",
+      "daily_routine"
+    ],
+    "transition_hints": [
+      "Work and studies often affect daily routines.",
+      "Pressure from responsibilities can influence wellbeing."
+    ]
+  },
+
+  {
+    "id": "relationships",
+    "topic": "Relationships",
+    "priority": "medium",
+    "description": "Interactions and experiences with family, friends, partners, or other important people.",
+    "completion_rule": "Need one meaningful statement about relationships.",
+    "keywords": [
+      "family",
+      "friend",
+      "partner",
+      "relationship",
+      "parents",
+      "marriage",
+      "people"
+    ],
+    "user_examples": [
+      "I've been arguing with my family.",
+      "I feel distant from everyone.",
+      "My relationship recently ended."
+    ],
+    "related_topics": [
+      "support",
+      "stressors",
+      "mood"
+    ],
+    "transition_hints": [
+      "Relationships can influence emotional wellbeing.",
+      "Support from others often becomes important."
+    ]
+  },
+
+  {
+    "id": "support",
+    "topic": "Support System",
+    "priority": "medium",
+    "description": "People or resources the user relies on during difficult times.",
+    "completion_rule": "Need one meaningful statement about available support.",
+    "keywords": [
+      "support",
+      "friend",
+      "family",
+      "talk",
+      "help",
+      "alone"
+    ],
+    "user_examples": [
+      "I talk to my best friend.",
+      "I don't have anyone.",
+      "My family supports me."
+    ],
+    "related_topics": [
+      "relationships",
+      "coping",
+      "mood"
+    ],
+    "transition_hints": [
+      "Support systems often influence how people manage difficult situations."
+    ]
+  },
+
+  {
+    "id": "coping",
+    "topic": "Coping Methods",
+    "priority": "medium",
+    "description": "Ways the user responds to or manages difficult experiences.",
+    "completion_rule": "Need one meaningful statement describing coping methods.",
+    "keywords": [
+      "cope",
+      "manage",
+      "deal",
+      "handle",
+      "exercise",
+      "music",
+      "gaming"
+    ],
+    "user_examples": [
+      "I usually listen to music.",
+      "I keep myself busy.",
+      "I don't really know how to cope."
+    ],
+    "related_topics": [
+      "support",
+      "stressors",
+      "goals"
+    ],
+    "transition_hints": [
+      "Understanding coping helps explain how the user responds to challenges."
+    ]
+  },
+
+  {
+    "id": "physical_health",
+    "topic": "Physical Health",
+    "priority": "low",
+    "description": "Physical health experiences that may influence mental wellbeing.",
+    "completion_rule": "Need one meaningful statement about physical health if relevant.",
+    "keywords": [
+      "pain",
+      "illness",
+      "health",
+      "medical",
+      "injury",
+      "disease"
+    ],
+    "user_examples": [
+      "I've been sick recently.",
+      "I have chronic pain.",
+      "My health hasn't been great."
+    ],
+    "related_topics": [
+      "energy",
+      "sleep"
+    ],
+    "transition_hints": [
+      "Physical health sometimes affects emotional wellbeing."
+    ]
+  },
+
+  {
+    "id": "substance_use",
+    "topic": "Substance Use",
+    "priority": "low",
+    "description": "Use of alcohol, tobacco, or other substances if the user naturally mentions them.",
+    "completion_rule": "Only explore if naturally introduced by the user.",
+    "keywords": [
+      "alcohol",
+      "drinking",
+      "smoking",
+      "drugs",
+      "cigarette"
+    ],
+    "user_examples": [
+      "I've been drinking more lately.",
+      "Smoking helps me calm down."
+    ],
+    "related_topics": [
+      "coping",
+      "stressors"
+    ],
+    "transition_hints": [
+      "Sometimes people mention using substances while dealing with stress."
+    ]
+  },
+
+  {
+    "id": "goals",
+    "topic": "Goals and Future Outlook",
+    "priority": "low",
+    "description": "Thoughts about the future, hopes, plans, or expectations.",
+    "completion_rule": "Need one meaningful statement about future outlook if naturally discussed.",
+    "keywords": [
+      "future",
+      "goal",
+      "plan",
+      "hope",
+      "career"
+    ],
+    "user_examples": [
+      "I don't know what comes next.",
+      "I hope things improve.",
+      "I want to finish college."
+    ],
+    "related_topics": [
+      "coping",
+      "support"
+    ],
+    "transition_hints": [
+      "Looking ahead sometimes helps understand how the user sees their situation."
+    ]
+  },
+
+  {
+    "id": "psychomotor",
+    "topic": "Psychomotor Changes",
+    "priority": "low",
+    "description": "Noticeable slowing down or increased restlessness in movement or speech.",
+    "completion_rule": "Need one meaningful statement describing slowing down or unusual restlessness.",
+    "keywords": [
+      "slow",
+      "moving slowly",
+      "restless",
+      "fidget",
+      "can't sit still"
+    ],
+    "user_examples": [
+      "Everything feels slow.",
+      "I can't sit still.",
+      "People say I've slowed down."
+    ],
+    "related_topics": [
+      "restlessness",
+      "energy"
+    ],
+    "transition_hints": [
+      "Changes in movement sometimes accompany changes in energy."
+    ]
+  },
+
+  {
+    "id": "safety",
+    "topic": "Safety",
+    "priority": "critical",
+    "description": "Thoughts about death, self-harm, suicide, or feeling that life is not worth living.",
+    "completion_rule": "Require direct evidence from the user's own words. Never infer.",
+    "keywords": [
+      "suicide",
+      "kill myself",
+      "self harm",
+      "end my life",
+      "better off dead",
+      "life isn't worth living"
+    ],
+    "user_examples": [
+      "Sometimes I wish I wasn't here.",
+      "I've thought about hurting myself.",
+      "Life doesn't feel worth living."
+    ],
+    "related_topics": [
+      "mood",
+      "self_worth",
+      "support"
+    ],
+    "transition_hints": [
+      "Always prioritize immediate safety over further exploration."
+    ]
+  }
+  ]
+}
