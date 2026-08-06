@@ -43,9 +43,9 @@ class KnowledgeBaseIngestion:
         print("Starting Knowledge Base Ingestion")
         print("=" * 60)
 
-        # --------------------------------------------------
+        
         # Step 1 : Load PDFs
-        # --------------------------------------------------
+        
 
         documents = self.loader.load_directory(
             knowledge_base_path
@@ -53,17 +53,17 @@ class KnowledgeBaseIngestion:
 
         print(f"Loaded {len(documents)} pages.")
 
-        # --------------------------------------------------
+        
         # Step 2 : Split into chunks
-        # --------------------------------------------------
+        
 
         chunks = self.chunker.split(documents)
 
         print(f"Generated {len(chunks)} chunks.")
 
-        # --------------------------------------------------
+        
         # Step 3 : Generate metadata
-        # --------------------------------------------------
+        
 
         prepared_documents = self.metadata_generator.prepare(
             chunks
@@ -71,9 +71,9 @@ class KnowledgeBaseIngestion:
 
         print(f"Prepared documents: {len(prepared_documents)}")
 
-        # --------------------------------------------------
+        
         # Step 4 : Upload to Qdrant
-        # --------------------------------------------------
+        
 
         self.uploader.upload(prepared_documents)
 

@@ -3,9 +3,9 @@ import json
 import psycopg2
 
 
-# ==========================================================
+
 # Database Connection
-# ==========================================================
+
 
 def get_connection(database_url):
 
@@ -22,9 +22,9 @@ def get_connection(database_url):
         return None
 
 
-# ==========================================================
+
 # Save Session To History
-# ==========================================================
+
 
 def save_to_history(
     session,
@@ -125,9 +125,9 @@ def save_to_history(
     conn.close()
 
 
-# ==========================================================
+
 # Get User History
-# ==========================================================
+
 
 def get_history(
     user_id,
@@ -193,9 +193,9 @@ def get_history(
     return history
 
 
-# ==========================================================
+
 # Get History Report
-# ==========================================================
+
 
 def get_history_report(
     history_id,

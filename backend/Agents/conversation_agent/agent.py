@@ -13,9 +13,9 @@ from database.session import (
 
 model = None
 
-# ==========================================================
+
 # Memory Agent Endpoint
-# ==========================================================
+
 
 MEMORY_API = "https://sohel1807--memory.modal.run"
 
@@ -24,9 +24,9 @@ def chat(user_id, message, api_key, database_url):
 
     global model
 
-    # --------------------------------------------------
+    
     # Initialize LLM (Only Once)
-    # --------------------------------------------------
+    
 
     if model is None:
 
@@ -38,9 +38,9 @@ def chat(user_id, message, api_key, database_url):
 
         )
 
-    # --------------------------------------------------
+    
     # Load Existing Session
-    # --------------------------------------------------
+    
 
     session = get_current_session(
 
@@ -128,9 +128,9 @@ def chat(user_id, message, api_key, database_url):
 
         )
 
-    # --------------------------------------------------
+    
     # Recent Conversation
-    # --------------------------------------------------
+    
 
     recent_conversation = (
 
@@ -144,9 +144,9 @@ def chat(user_id, message, api_key, database_url):
 
     )[-8:]
 
-    # --------------------------------------------------
+    
     # Memory Update FIRST
-    # --------------------------------------------------
+    
 
     try:
 
@@ -186,9 +186,9 @@ def chat(user_id, message, api_key, database_url):
 
         }
 
-    # --------------------------------------------------
+    
     # Build Conversation Context
-    # --------------------------------------------------
+    
 
     conversation_context = build_conversation_context(
 
@@ -200,9 +200,9 @@ def chat(user_id, message, api_key, database_url):
 
     )
 
-    # --------------------------------------------------
+    
     # Build Prompt
-    # --------------------------------------------------
+    
 
     messages = build_prompt(
 
@@ -212,17 +212,17 @@ def chat(user_id, message, api_key, database_url):
 
     )
 
-    # --------------------------------------------------
+    
     # Generate Assistant Response
-    # --------------------------------------------------
+    
 
     result = model.invoke(messages)
 
     assistant_reply = result.content
 
-    # --------------------------------------------------
+    
     # Update Conversation
-    # --------------------------------------------------
+    
 
     conversation.append(
 
@@ -248,9 +248,9 @@ def chat(user_id, message, api_key, database_url):
 
     )
 
-    # --------------------------------------------------
+    
     # Save Conversation + Memory
-    # --------------------------------------------------
+    
 
     update_conversation(
 
@@ -264,8 +264,8 @@ def chat(user_id, message, api_key, database_url):
 
     )
 
-    # --------------------------------------------------
+    
     # Return Reply
-    # --------------------------------------------------
+    
 
     return assistant_reply

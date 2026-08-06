@@ -13,9 +13,9 @@ st.set_page_config(
     layout="wide"
 )
 
-# ============================================
+
 # Check Login
-# ============================================
+
 
 if "logged_in" not in st.session_state:
 
@@ -29,18 +29,18 @@ if not st.session_state.logged_in:
 
 
 app_sidebar()
-# ============================================
+
 # Dashboard API
-# ============================================
+
 
 DASHBOARD_API = (
     "https://sohel1807--dashboard.modal.run"
 )
 
 
-# ============================================
+
 # Load Dashboard
-# ============================================
+
 
 with st.spinner("Loading assessment report..."):
 
@@ -82,9 +82,9 @@ emotions = data["emotion_json"]
 recommendations = data["recommendation_json"]
 
 
-# ============================================
+
 # Header
-# ============================================
+
 
 st.title("🧠 MANAS AI Dashboard")
 
@@ -95,40 +95,40 @@ st.caption(
 st.divider()
 
 
-# ============================================
+
 # Summary
-# ============================================
+
 
 summary_card(summary)
 
-# ============================================
+
 # Risk Cards
-# ============================================
+
 
 score_card(assessment)
 
-# ============================================
+
 # Symptoms
-# ============================================
+
 
 symptom_card(symptoms)
 
-# ============================================
+
 # Emotion Timeline
-# ============================================
+
 
 emotion_chart(emotions)
 
 
-# ============================================
+
 # Recommendations
-# ============================================
+
 
 recommendation_card(recommendations)
 
-# ============================================
+
 # Bottom Buttons
-# ============================================
+
 
 col1, col2, col3 = st.columns(3)
 

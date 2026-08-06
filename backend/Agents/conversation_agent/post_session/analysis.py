@@ -1,27 +1,27 @@
 import requests
 
 
-# ==========================================================
+
 # Analysis Agent Endpoint
-# ==========================================================
+
 
 ANALYSIS_AGENT_URL = (
     "https://atharva7758--analysis.modal.run"
 )
 
 
-# ==========================================================
+
 # Assessment Agent Endpoint
-# ==========================================================
+
 
 ASSESSMENT_AGENT_URL = (
     "https://sohel1807--assessment.modal.run"
 )
 
 
-# ==========================================================
+
 # Call Analysis Agent
-# ==========================================================
+
 
 def call_analysis_agent(conversation):
 
@@ -42,9 +42,9 @@ def call_analysis_agent(conversation):
     return response.json()
 
 
-# ==========================================================
+
 # Call Assessment Agent
-# ==========================================================
+
 
 def call_assessment_agent(
     conversation_summary,

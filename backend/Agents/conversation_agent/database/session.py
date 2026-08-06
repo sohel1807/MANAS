@@ -17,9 +17,9 @@ def get_connection(database_url):
         return None
 
 
-# ==========================================================
+
 # Default Structures
-# ==========================================================
+
 
 DEFAULT_SUMMARY = {
     "main_issue": "",
@@ -36,9 +36,9 @@ DEFAULT_COVERED_TOPICS = {
 }
 
 
-# ==========================================================
+
 # Get Current Session
-# ==========================================================
+
 
 def get_current_session(user_id, database_url):
 
@@ -116,9 +116,9 @@ def get_current_session(user_id, database_url):
     }
 
 
-# ==========================================================
+
 # Create Session
-# ==========================================================
+
 
 def create_session(user_id, database_url):
 
@@ -195,9 +195,9 @@ def create_session(user_id, database_url):
     return session_id
 
 
-# ==========================================================
+
 # Update Conversation
-# ==========================================================
+
 
 def update_conversation(
 
@@ -284,9 +284,9 @@ def update_conversation(
     conn.close()
 
 
-# ==========================================================
+
 # Update Session Status
-# ==========================================================
+
 
 def update_session_status(
     session_id,
@@ -324,9 +324,9 @@ def update_session_status(
     conn.close()
 
 
-# ==========================================================
+
 # Update Post Session
-# ==========================================================
+
 
 def update_post_session(
     session_id,
@@ -402,13 +402,13 @@ def update_post_session(
 
     conn.close()
     
-# ==========================================================
-# Get Latest Session
-# ==========================================================
 
-# ==========================================================
 # Get Latest Session
-# ==========================================================
+
+
+
+# Get Latest Session
+
 
 def get_latest_session(
     user_id,
@@ -523,9 +523,9 @@ def get_latest_session(
 
     }
     
-    # ==========================================================
+    
 # Delete Current Session
-# ==========================================================
+
 
 def delete_current_session(
     session_id,

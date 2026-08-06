@@ -39,9 +39,9 @@ class VectorStore:
             api_key=QDRANT_API_KEY
         )
 
-    # ==========================================================
+    
     # Collection
-    # ==========================================================
+    
 
     def create_collection(self):
         """
@@ -69,9 +69,9 @@ class VectorStore:
 
         print(f"Collection '{QDRANT_COLLECTION}' created successfully.")
 
-    # ==========================================================
+    
     # Upload Documents
-    # ==========================================================
+    
 
     def upload_documents(self, points):
         """
@@ -87,9 +87,9 @@ class VectorStore:
             points=points
         )
 
-    # ==========================================================
+    
     # Search
-    # ==========================================================
+    
 
     def search(
     self,
@@ -110,9 +110,9 @@ class VectorStore:
 
         return response.points
 
-    # ==========================================================
+    
     # Delete Collection
-    # ==========================================================
+    
 
     def delete_collection(self):
         """
@@ -123,9 +123,9 @@ class VectorStore:
             collection_name=QDRANT_COLLECTION
         )
 
-    # ==========================================================
+    
     # Collection Exists
-    # ==========================================================
+    
 
     def collection_exists(self):
         """
@@ -141,9 +141,9 @@ class VectorStore:
 
         return QDRANT_COLLECTION in names
 
-    # ==========================================================
+    
     # Collection Info
-    # ==========================================================
+    
 
     def get_collection_info(self):
         """

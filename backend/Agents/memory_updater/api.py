@@ -12,9 +12,9 @@ from agent import analyze
 from analysis import load_groq_model
 
 
-# ==========================================================
+
 # Modal Image
-# ==========================================================
+
 
 image = (
     Image.debian_slim(python_version="3.12")
@@ -38,9 +38,9 @@ app = App(
 )
 
 
-# ==========================================================
+
 # Memory Service
-# ==========================================================
+
 
 @app.cls(
     secrets=[
@@ -81,9 +81,9 @@ class MemoryService:
         )
 
 
-# ==========================================================
+
 # FastAPI Endpoint
-# ==========================================================
+
 
 @app.function()
 @modal.fastapi_endpoint(
