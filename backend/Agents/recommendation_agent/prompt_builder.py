@@ -28,9 +28,9 @@ class PromptBuilder:
             {}
         )
 
-        # =====================================================
+       
         # Build Retrieved Knowledge Context
-        # =====================================================
+       
 
         knowledge_chunks = []
 
@@ -58,9 +58,9 @@ Content:
 
         knowledge_context = "\n".join(knowledge_chunks)
 
-        # =====================================================
+       
         # Example Output
-        # =====================================================
+       
 
         example_json = """
 {
@@ -112,9 +112,9 @@ Content:
 }
 """
 
-        # =====================================================
+       
         # Prompt
-        # =====================================================
+       
 
         prompt = f"""
 You are MANAS, an AI Mental Wellness Recommendation Assistant.

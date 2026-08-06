@@ -10,16 +10,16 @@ from langchain_core.messages import (
 from Knowledge_base.loader import load_knowledge_base
 
 
-# ==========================================================
+
 # Load Knowledge Base (Only Once)
-# ==========================================================
+
 
 knowledge = load_knowledge_base()
 
 
-# ==========================================================
+
 # Prompt Builder
-# ==========================================================
+
 
 def build_prompt():
 
@@ -159,9 +159,9 @@ No explanation.
 """
 
 
-# ==========================================================
+
 # Empty Analysis
-# ==========================================================
+
 
 def empty_analysis():
 
@@ -194,9 +194,9 @@ def empty_analysis():
     }
 
 
-# ==========================================================
+
 # JSON Cleaner
-# ==========================================================
+
 
 def clean_json(text: str):
 
@@ -221,9 +221,9 @@ def clean_json(text: str):
     return text.strip()
 
 
-# ==========================================================
+
 # JSON Parser
-# ==========================================================
+
 
 def parse_analysis(response_text):
 
@@ -237,9 +237,9 @@ def parse_analysis(response_text):
 
         return empty_analysis()
 
-    # ------------------------------------------------------
+    
     # Top Level Defaults
-    # ------------------------------------------------------
+    
 
     if not isinstance(data, dict):
         return empty_analysis()
@@ -256,9 +256,9 @@ def parse_analysis(response_text):
 
     summary = data["conversation_summary"]
 
-    # ------------------------------------------------------
+    
     # Summary Defaults
-    # ------------------------------------------------------
+    
 
     if not isinstance(summary, dict):
         summary = {}
@@ -304,9 +304,9 @@ def parse_analysis(response_text):
 
         summary["current_stage"] = "early"
 
-    # ------------------------------------------------------
+    
     # Protective Factors Cleanup
-    # ------------------------------------------------------
+    
 
     if not isinstance(
         summary["protective_factors"],
@@ -338,9 +338,9 @@ def parse_analysis(response_text):
 
     summary["protective_factors"] = cleaned_pf
 
-    # ------------------------------------------------------
+    
     # Risk Observations Cleanup
-    # ------------------------------------------------------
+    
 
     if not isinstance(
         summary["risk_observations"],
@@ -365,9 +365,9 @@ def parse_analysis(response_text):
 
     data["conversation_summary"] = summary
 
-    # ------------------------------------------------------
+    
     # Covered Topics Validation
-    # ------------------------------------------------------
+    
 
     if not isinstance(
         data["covered_topics"],
@@ -430,15 +430,15 @@ def parse_analysis(response_text):
 
     data["covered_topics"] = covered
 
-    # ------------------------------------------------------
+    
     # Return
-    # ------------------------------------------------------
+    
 
     return data
 
-# ==========================================================
+
 # Main Analysis Function
-# ==========================================================
+
 
 def generate_analysis(
     recent_messages,
@@ -476,9 +476,9 @@ def generate_analysis(
         }
     """
 
-    # ------------------------------------------------------
+    
     # Prepare Payload
-    # ------------------------------------------------------
+    
 
     payload = {
 
@@ -490,9 +490,9 @@ def generate_analysis(
 
     }
 
-    # ------------------------------------------------------
+    
     # Prompt
-    # ------------------------------------------------------
+    
 
     messages = [
 
@@ -510,9 +510,9 @@ def generate_analysis(
 
     ]
 
-    # ------------------------------------------------------
+    
     # LLM Call
-    # ------------------------------------------------------
+    
 
     try:
 
@@ -538,9 +538,9 @@ def generate_analysis(
 
         }
     
-# ==========================================================
+
 # Shared Groq Model
-# ==========================================================
+
 
 def load_groq_model(api_key):
     """
@@ -562,9 +562,9 @@ def load_groq_model(api_key):
     )
     
     
-# ==========================================================
+
 # Candidate Topic Selector
-# ==========================================================
+
 
 def get_candidate_topics(covered_topics):
 

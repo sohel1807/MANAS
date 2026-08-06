@@ -7,9 +7,9 @@ def score_card(assessment):
 
     col1, col2, col3 = st.columns(3)
 
-    # ==========================
+   
     # Overall Risk
-    # ==========================
+   
 
     with col1:
 
@@ -24,9 +24,9 @@ def score_card(assessment):
             f"Concern: {risk.get('symptom_concern', 'N/A')}"
         )
 
-    # ==========================
+   
     # PHQ-9
-    # ==========================
+   
 
     with col2:
 
@@ -49,9 +49,9 @@ def score_card(assessment):
                     f"{item.replace('_',' ').title()}: {score}"
                 )
 
-    # ==========================
+   
     # GAD-7
-    # ==========================
+   
 
     with col3:
 
@@ -74,9 +74,9 @@ def score_card(assessment):
                     f"{item.replace('_',' ').title()}: {score}"
                 )
 
-    # ==========================
+   
     # Wellness Insights
-    # ==========================
+   
 
     insights = assessment.get("wellness_insights", {})
 

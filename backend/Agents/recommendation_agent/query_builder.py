@@ -15,9 +15,9 @@ class QueryBuilder:
 
         query_parts = []
 
-        # ==========================================
+        
         # Conversation Summary
-        # ==========================================
+        
 
         conversation = data.get("conversation_summary", {})
 
@@ -37,9 +37,9 @@ class QueryBuilder:
             if conversation.strip():
                 query_parts.append(conversation)
 
-        # ==========================================
+        
         # Emotion Summary
-        # ==========================================
+        
 
         emotion_summary = data.get("emotion_summary", [])
 
@@ -67,9 +67,9 @@ class QueryBuilder:
             if emotion_summary.strip():
                 query_parts.append(emotion_summary)
 
-        # ==========================================
+        
         # Symptoms
-        # ==========================================
+        
 
         symptoms = data.get("symptoms", {})
 
@@ -98,9 +98,9 @@ class QueryBuilder:
                     ", ".join(symptoms)
                 )
 
-        # ==========================================
+        
         # Assessment
-        # ==========================================
+        
 
         assessment = data.get("assessment", {})
 
@@ -122,9 +122,9 @@ class QueryBuilder:
                 f"PHQ-9 Severity: {severity}"
             )
 
-        # ==========================================
+        
         # Overall Risk
-        # ==========================================
+        
 
         overall_risk = assessment.get("overall_risk", {})
 
@@ -135,9 +135,9 @@ class QueryBuilder:
                 f"Overall Risk: {level}"
             )
 
-        # ==========================================
+        
         # Wellness Insights
-        # ==========================================
+        
 
         insights = assessment.get(
             "wellness_insights",

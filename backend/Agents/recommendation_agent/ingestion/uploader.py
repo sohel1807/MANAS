@@ -39,18 +39,18 @@ class QdrantUploader:
             print("No documents received.")
             return
 
-        # --------------------------------------------------
+        
         # Extract text from all documents
-        # --------------------------------------------------
+        
 
         texts = [doc["content"] for doc in documents]
 
         print(f"Documents received: {len(texts)}")
         print("Generating embeddings...")
 
-        # --------------------------------------------------
+        
         # Batch embedding generation
-        # --------------------------------------------------
+        
 
         vectors = self.embedding_model.encode(
             texts,
@@ -59,9 +59,9 @@ class QdrantUploader:
 
         print(f"Generated {len(vectors)} embeddings.")
 
-        # --------------------------------------------------
+        
         # Build Qdrant points
-        # --------------------------------------------------
+        
 
         points = []
 
@@ -82,15 +82,15 @@ class QdrantUploader:
 
         print(f"Points created: {len(points)}")
 
-        # --------------------------------------------------
+        
         # Create collection
-        # --------------------------------------------------
+        
 
         self.vector_store.create_collection()
 
-        # --------------------------------------------------
+        
         # Upload
-        # --------------------------------------------------
+        
 
         print("Uploading to Qdrant...")
 

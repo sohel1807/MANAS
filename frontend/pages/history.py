@@ -9,9 +9,9 @@ st.set_page_config(
     layout="wide"
 )
 
-# ============================================
+
 # Login Check
-# ============================================
+
 
 if "logged_in" not in st.session_state:
 
@@ -28,9 +28,9 @@ st.title("📜 Assessment History")
 
 st.divider()
 
-# ============================================
+
 # Load History
-# ============================================
+
 
 response = requests.get(
     "https://sohel1807--history.modal.run",
@@ -53,9 +53,9 @@ if len(history) == 0:
 
     st.stop()
 
-# ============================================
+
 # History Cards
-# ============================================
+
 
 for report in history:
 

@@ -10,9 +10,9 @@ st.set_page_config(
 )
 
 
-# ==========================
+
 # Check Login
-# ==========================
+
 
 if "logged_in" not in st.session_state or not st.session_state.logged_in:
 
@@ -24,9 +24,9 @@ if "logged_in" not in st.session_state or not st.session_state.logged_in:
 
 
 
-# ==========================
+
 # Header
-# ==========================
+
 
 st.title("🧠 MANAS AI")
 
@@ -38,9 +38,9 @@ st.divider()
 
 
 
-# ==========================
+
 # Progress Containers
-# ==========================
+
 
 
 summary = st.empty()
@@ -75,9 +75,9 @@ recommendation.info(
 
 
 
-# ==========================
+
 # Poll Status API
-# ==========================
+
 
 
 while True:

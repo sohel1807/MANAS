@@ -4,9 +4,9 @@ from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage
 
 
-# ==========================================================
+
 # Load Groq Model
-# ==========================================================
+
 
 def load_groq_model(
     groq_api_key,
@@ -26,9 +26,9 @@ def load_groq_model(
     )
 
 
-# ==========================================================
+
 # Assessment Analysis
-# ==========================================================
+
 
 def analyze(
 
