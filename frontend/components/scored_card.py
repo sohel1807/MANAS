@@ -33,7 +33,7 @@ def score_card(assessment):
         phq = assessment.get("phq9", {})
 
         st.metric(
-            label="PHQ-9",
+            label="Depression Screening",
             value=phq.get("score", 0)
         )
 
@@ -58,7 +58,7 @@ def score_card(assessment):
         gad = assessment.get("gad7", {})
 
         st.metric(
-            label="GAD-7",
+            label="Anxiety Screening",
             value=gad.get("score", 0)
         )
 
