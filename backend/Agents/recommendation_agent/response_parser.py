@@ -31,9 +31,9 @@ class ResponseParser:
         if not response:
             raise ValueError("Empty response received from LLM.")
 
-        # --------------------------------------------------
+        
         # Remove Markdown code blocks if present
-        # --------------------------------------------------
+        
 
         cleaned = response.strip()
 
@@ -58,9 +58,9 @@ class ResponseParser:
 
         cleaned = cleaned.strip()
 
-        # --------------------------------------------------
+        
         # Parse JSON
-        # --------------------------------------------------
+        
 
         try:
             parsed = json.loads(cleaned)
@@ -70,9 +70,9 @@ class ResponseParser:
                 f"Invalid JSON returned by LLM.\n{e}"
             )
 
-        # --------------------------------------------------
+        
         # Basic Validation
-        # --------------------------------------------------
+        
 
         if not isinstance(parsed, dict):
             raise ValueError(

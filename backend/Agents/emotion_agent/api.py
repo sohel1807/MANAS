@@ -13,9 +13,9 @@ from emotion_model import load_emotion_model
 from symptom_analysis import load_groq_model
 
 
-# ==========================================================
+
 # Modal Image
-# ==========================================================
+
 
 image = (
     Image.debian_slim(python_version="3.12")
@@ -39,9 +39,9 @@ app = App(
 )
 
 
-# ==========================================================
+
 # Analysis Service
-# ==========================================================
+
 
 @app.cls(
     secrets=[
@@ -85,9 +85,9 @@ class AnalysisService:
         )
 
 
-# ==========================================================
+
 # FastAPI Endpoint
-# ==========================================================
+
 
 @app.function()
 @modal.fastapi_endpoint(

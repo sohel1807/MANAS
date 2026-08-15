@@ -3,9 +3,9 @@ from datetime import datetime
 from score_mapper import apply_symptom_evidence
 
 
-# ==========================================================
+
 # PHQ-9 Severity
-# ==========================================================
+
 
 def phq9_severity(score):
 
@@ -24,9 +24,9 @@ def phq9_severity(score):
     return "Severe"
 
 
-# ==========================================================
+
 # GAD-7 Severity
-# ==========================================================
+
 
 def gad7_severity(score):
 
@@ -41,9 +41,9 @@ def gad7_severity(score):
 
     return "Severe"
 
-# ==========================================================
+
 # Symptom Concern
-# ==========================================================
+
 
 def symptom_concern(symptom_json):
 
@@ -89,9 +89,9 @@ def symptom_concern(symptom_json):
 
     return "Low"
 
-# ==========================================================
+
 # Overall Risk
-# ==========================================================
+
 
 def overall_risk(
     phq_severity,
@@ -140,9 +140,9 @@ def overall_risk(
         return "High"
 
 
-# ==========================================================
+
 # Dominant Areas
-# ==========================================================
+
 
 def extract_dominant_areas(
     symptom_json,
@@ -174,9 +174,9 @@ def extract_dominant_areas(
     return areas[:top_k]
 
 
-# ==========================================================
+
 # Build Final Assessment JSON
-# ==========================================================
+
 
 def build_assessment(
 
@@ -188,9 +188,9 @@ def build_assessment(
 
 ):
 
-    # ------------------------------------------------------
+    
     # Apply symptom evidence using assessment_mapping
-    # ------------------------------------------------------
+    
 
     mapped_scores = apply_symptom_evidence(
 
@@ -204,9 +204,9 @@ def build_assessment(
 
     gad_items = mapped_scores["gad7"]
 
-    # ------------------------------------------------------
+    
     # Calculate Scores
-    # ------------------------------------------------------
+    
 
     phq_score = sum(
         phq_items.values()
@@ -216,9 +216,9 @@ def build_assessment(
         gad_items.values()
     )
 
-    # ------------------------------------------------------
+    
     # Calculate Severity
-    # ------------------------------------------------------
+    
 
     phq_severity = phq9_severity(
         phq_score
@@ -228,16 +228,16 @@ def build_assessment(
         gad_score
     )
 
- # ------------------------------------------------------
+ 
     # Symptom Concern Level
-    # ------------------------------------------------------
+    
 
     symptom_level = symptom_concern(
         symptom_json
     )
-    # ------------------------------------------------------
+    
     # Final JSON
-    # ------------------------------------------------------
+    
 
     return {
 

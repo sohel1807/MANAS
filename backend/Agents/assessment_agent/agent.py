@@ -14,27 +14,27 @@ def analyze(
     Run the complete assessment pipeline.
     """
 
-    # ------------------------------------------------------
+    
     # Build Prompt
-    # ------------------------------------------------------
+    
 
     prompt = build_prompt(
         conversation_summary=conversation_summary,
         symptom_json=symptom_json,
     )
 
-    # ------------------------------------------------------
+    
     # LLM Assessment
-    # ------------------------------------------------------
+    
 
     response = run_analysis(
         prompt=prompt,
         groq_model=groq_model,
     )
 
-    # ------------------------------------------------------
+    
     # Parse Response
-    # ------------------------------------------------------
+    
 
     parsed_response = parse_response(
     response
@@ -46,9 +46,9 @@ def analyze(
         symptom_json
     )
 
-    # ------------------------------------------------------
+    
     # Build Final Assessment
-    # ------------------------------------------------------
+    
 
     assessment = build_assessment(
 

@@ -1,6 +1,6 @@
-# ==========================================================
+
 # Convert severity -> PHQ/GAD frequency score
-# ==========================================================
+
 
 def severity_to_score(level):
 
@@ -23,9 +23,9 @@ def severity_to_score(level):
     )
 
 
-# ==========================================================
+
 # Apply symptom evidence using LLM assessment mapping
-# ==========================================================
+
 
 def apply_symptom_evidence(
 

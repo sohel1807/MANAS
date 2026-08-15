@@ -8,9 +8,11 @@ WINDOW_SIZE = 4
 TOP_K_EMOTIONS = 3
 
 
-# ==========================================================
+
 # Collect User Messages
-# ==========================================================
+
+
+
 
 def collect_user_messages(conversation):
 
@@ -38,9 +40,9 @@ def collect_user_messages(conversation):
     return user_messages
 
 
-# ==========================================================
+
 # Split Into Windows
-# ==========================================================
+
 
 def split_into_windows(user_messages):
 
@@ -75,9 +77,9 @@ def split_into_windows(user_messages):
     return windows
 
 
-# ==========================================================
+
 # Predict Emotions
-# ==========================================================
+
 
 def predict_window_emotions(
     windows,
@@ -109,9 +111,9 @@ def predict_window_emotions(
     return windows
 
 
-# ==========================================================
+
 # Build Emotion Timeline
-# ==========================================================
+
 
 def build_emotion_timeline(windows):
 
@@ -122,9 +124,9 @@ def build_emotion_timeline(windows):
     return windows
 
 
-# ==========================================================
+
 # Complete Emotion Analysis
-# ==========================================================
+
 
 def analyze_emotions(
     conversation,
@@ -149,9 +151,9 @@ def analyze_emotions(
     )
 
 
-# ==========================================================
+
 # Main Analysis
-# ==========================================================
+
 
 def analyze(
     conversation,

@@ -35,9 +35,9 @@ app = App(
 )
 
 
-# ==========================================================
+
 # Background Processor
-# ==========================================================
+
 
 @app.function(
     secrets=[
@@ -68,9 +68,9 @@ def run_post_session(session):
         raise
 
 
-# ==========================================================
+
 # Stop Session Endpoint
-# ==========================================================
+
 
 @app.function(
     secrets=[
@@ -114,9 +114,9 @@ def stop_session(info: dict):
         "message": "Session stopped. Analysis started."
     }
     
-# ==========================================================
+
 # Session Status Endpoint
-# ==========================================================
+
 
 @app.function(
     secrets=[
@@ -184,9 +184,9 @@ def dashboard(user_id: int):
     return session
 
 
-# ==========================================================
+
 # New Session Endpoint
-# ==========================================================
+
 
 @app.function(
     secrets=[
@@ -238,9 +238,9 @@ def new_session(info: dict):
 
     }
 
-# ==========================================================
+
 # History List
-# ==========================================================
+
 
 @app.function(
     secrets=[
@@ -262,9 +262,9 @@ def history(user_id: int):
 
     return history
 
-# ==========================================================
+
 # History Report
-# ==========================================================
+
 
 @app.function(
     secrets=[

@@ -8,9 +8,9 @@ st.set_page_config(
     layout="wide"
 )
 
-# ==========================
+
 # Session State
-# ==========================
+
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -22,9 +22,9 @@ if "session_stopped" not in st.session_state:
     st.session_state.session_stopped = False
 
 
-# ==========================
+
 # Login/Register
-# ==========================
+
 
 if not st.session_state.logged_in:
 
@@ -130,9 +130,9 @@ if not st.session_state.logged_in:
                 )
 
 
-# ==========================
+
 # Chat Page
-# ==========================
+
 
 else:
 
@@ -146,9 +146,9 @@ else:
 
     st.divider()
 
-    # ==========================
+    
     # Viewing History Banner
-    # ==========================
+    
 
     if "history_data" in st.session_state:
 
@@ -156,9 +156,9 @@ else:
             "📜 You are viewing a previous assessment report."
         )
 
-    # ==========================
+    
     # Chat Messages
-    # ==========================
+    
 
     for msg in st.session_state.messages:
 
@@ -191,9 +191,9 @@ else:
         for msg in st.session_state.messages
         if msg["role"] == "user"
     )
-    # ==========================
+    
     # Finish Assessment
-    # ==========================
+    
 
     if not st.session_state.session_stopped:
 
@@ -234,9 +234,9 @@ else:
             "🧠 Your assessment is being prepared. Please wait..."
         )
 
-    # ==========================
+    
     # Chat Input
-    # ==========================
+    
 
     if (
         not st.session_state.session_stopped

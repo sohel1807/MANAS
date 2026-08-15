@@ -41,34 +41,34 @@ class RecommendationAgent:
         """
 
         try:
-            # -------------------------------------
+            
             # 1. Build Retrieval Query
-            # -------------------------------------
+            
             retrieval_query = self.query_builder.build(data)
 
-            # -------------------------------------
+            
             # 2. Retrieve Relevant Knowledge
-            # -------------------------------------
+            
             retrieved_docs = self.retriever.retrieve(
                 retrieval_query
             )
 
-            # -------------------------------------
+            
             # 3. Build Prompt
-            # -------------------------------------
+            
             prompt = self.prompt_builder.build(
                 data=data,
                 documents=retrieved_docs
             )
 
-            # -------------------------------------
+            
             # 4. Generate Recommendation
-            # -------------------------------------
+            
             llm_response = self.llm.generate(prompt)
 
-            # -------------------------------------
+            
             # 5. Parse Response
-            # -------------------------------------
+            
             recommendation_json = self.response_parser.parse(
                 llm_response
             )
