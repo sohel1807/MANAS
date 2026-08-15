@@ -19,9 +19,10 @@ def load_groq_model(
 
         api_key=groq_api_key,
 
-        model="llama-3.3-70b-versatile",
+        model="qwen/qwen3.6-27b",
 
         temperature=0,
+        reasoning_effort="none"
 
     )
 
