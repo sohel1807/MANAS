@@ -275,11 +275,12 @@ def load_groq_model(api_key):
 
     return ChatGroq(
 
-        model_name="llama-3.3-70b-versatile",
+        model_name="qwen/qwen3.6-27b",
 
         api_key=api_key,
 
         temperature=0,
+        reasoning_effort="none",
 
         max_retries=2,
 

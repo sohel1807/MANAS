@@ -32,9 +32,10 @@ def chat(user_id, message, api_key, database_url):
 
         model = ChatGroq(
 
-            model_name="llama-3.3-70b-versatile",
+            model_name="qwen/qwen3.6-27b",
 
             api_key=api_key,
+            reasoning_effort="none",
 
         )
 

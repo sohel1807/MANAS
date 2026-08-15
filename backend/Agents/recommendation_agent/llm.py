@@ -19,8 +19,9 @@ class RecommendationLLM:
 
         self.llm = ChatGroq(
             api_key=os.getenv("GROQ_API_KEY"),
-            model_name="llama-3.3-70b-versatile",
+            model_name="qwen/qwen3.6-27b",
             temperature=0.2,
+            reasoning_effort="none",
         )
 
     def generate(self, prompt: str) -> str:
